@@ -1,0 +1,10 @@
+main () { 
+  const foo = 0;
+  int my_2nd_var = 42;
+
+  const myexp = 10e5;
+  int toto=-3;
+  toto = toto + -1;
+
+  printf(my_2nd_var);
+}
