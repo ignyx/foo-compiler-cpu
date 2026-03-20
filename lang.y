@@ -4,12 +4,32 @@
 void yyerror(char *s);
 %}
 
-%token tTAB tSPACE tLF tCONST tINT tMAIN tINTEGER tIDENTIFIER tBRACKET_LEFT tBRACKET_RIGHT tPARENTHISIS_LEFT tPARENTHISIS_RIGHT tCOMMA tSEMICOLON tEGAL tSOU tADD tMUL tDIV tERROR 
+%union { int number; char* var; }
+%token tTAB tSPACE tLF tCONST tINT tMAIN tBRACKET_LEFT tBRACKET_RIGHT tPARENTHISIS_LEFT tPARENTHISIS_RIGHT tCOMMA tSEMICOLON tEGAL tSOU tADD tMUL tDIV tERROR 
+%token <number> tINTEGER
+%token <var> tIDENTIFIER
 %start START
 
 %%
 
-START : tMAIN;
+/* Steps:
+- [ ] Write lexical parser
+- [ ] Write symbol table in separate file (probably using a linked list; in report explain why not redimensional arr)
+- [ ] Print assembly instructions
+*/
+
+/* recognize `main () { ... }` */
+START : tMAIN tPARENTHISIS_LEFT tPARENTHISIS_RIGHT tBRACKET_LEFT FUNCTION_BODY tBRACKET_RIGHT;
+
+FUNCTION_BODY: FUNCTION_DECLARE /*FUNCTION_INSTRUCTIONS */;
+FUNCTION_DECLARE: DECLARE_CONST FUNCTION_DECLARE | /*DECLARE_VAR FUNCTION_DECLARE | /* empty */ ;
+
+/* recognize `const a = 2;` */
+DECLARE_CONST: tCONST tIDENTIFIER tEGAL tINTEGER tSEMICOLON 
+  { printf("AFC %d %d\n", 1, $4); }; /* TODO handle case with comma */
+
+
+
 
 %%
 
