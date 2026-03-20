@@ -5,9 +5,12 @@ void yyerror(char *s);
 %}
 
 %union { int number; char* var; }
+/* TODO remove tab and related tokens */
 %token tTAB tSPACE tLF tCONST tINT tMAIN tBRACKET_LEFT tBRACKET_RIGHT tPARENTHISIS_LEFT tPARENTHISIS_RIGHT tCOMMA tSEMICOLON tEGAL tSOU tADD tMUL tDIV tERROR 
 %token <number> tINTEGER
 %token <var> tIDENTIFIER
+/* Used to tell appart constants and variables in symbol table */
+%type <number> DECLARE_MODIFIER
 %start START
 
 %%
@@ -19,14 +22,21 @@ void yyerror(char *s);
 */
 
 /* recognize `main () { ... }` */
-START : tMAIN tPARENTHISIS_LEFT tPARENTHISIS_RIGHT tBRACKET_LEFT FUNCTION_BODY tBRACKET_RIGHT;
+START : tMAIN tPARENTHISIS_LEFT tPARENTHISIS_RIGHT tBRACKET_LEFT FUNCTION_BODY tBRACKET_RIGHT
+  { return 0; };
 
 FUNCTION_BODY: FUNCTION_DECLARE /*FUNCTION_INSTRUCTIONS */;
-FUNCTION_DECLARE: DECLARE_CONST FUNCTION_DECLARE | /*DECLARE_VAR FUNCTION_DECLARE | /* empty */ ;
+FUNCTION_DECLARE: DECLARE FUNCTION_DECLARE | /*DECLARE_VAR FUNCTION_DECLARE | /* empty */ ;
 
 /* recognize `const a = 2;` */
-DECLARE_CONST: tCONST tIDENTIFIER tEGAL tINTEGER tSEMICOLON 
+DECLARE: DECLARE_MODIFIER tIDENTIFIER tEGAL tINTEGER tSEMICOLON 
   { printf("AFC %d %d\n", 1, $4); }; /* TODO handle case with comma */
+DECLARE_MODIFIER: 
+  /* TODO store this data inside the symbol table */
+  tCONST { $$=0; }
+  | tINT { $$=1; };
+
+
 
 
 
