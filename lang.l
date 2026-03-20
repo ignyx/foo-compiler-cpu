@@ -13,6 +13,7 @@
 const { return tCONST; }
 int { return tINT; }
 main { return tMAIN; }
+printf { return tPRINTF; }
 -?[0-9]+e[0-9]+ { return tINTEGER; }
 -?[0-9]+ { yylval.number = atoi(yytext); return tINTEGER; }
 [A-Za-z0-9_]+ { return tIDENTIFIER; }
