@@ -13,6 +13,10 @@ void yyerror(char *s);
 %type <number> DECLARE_MODIFIER
 %start START
 
+%right tEGAL
+%left tADD tSOU
+%left tMUL tDIV
+
 %%
 
 /* Steps:
@@ -25,17 +29,27 @@ void yyerror(char *s);
 START : tMAIN tPARENTHISIS_LEFT tPARENTHISIS_RIGHT tBRACKET_LEFT FUNCTION_BODY tBRACKET_RIGHT
   { return 0; };
 
-FUNCTION_BODY: FUNCTION_DECLARE /*FUNCTION_INSTRUCTIONS */;
-FUNCTION_DECLARE: DECLARE FUNCTION_DECLARE | /*DECLARE_VAR FUNCTION_DECLARE | /* empty */ ;
+FUNCTION_BODY: FUNCTION_DECLARE FUNCTION_INSTRUCTIONS ;
+FUNCTION_DECLARE: DECLARE FUNCTION_DECLARE | /* empty */ ;
 
 /* recognize `const a = 2;` */
 DECLARE: DECLARE_MODIFIER tIDENTIFIER tEGAL tINTEGER tSEMICOLON 
-  { printf("AFC %d %d\n", 1, $4); }; /* TODO handle case with comma */
+  { printf("AFC %d %d\n", 1, $4); }; /* TODO handle case with comma, maybe using yymore() (ctrl+f concat) */
 DECLARE_MODIFIER: 
   /* TODO store this data inside the symbol table */
   tCONST { $$=0; }
   | tINT { $$=1; };
 
+FUNCTION_INSTRUCTIONS: MATH_INSRUCTION FUNCTION_INSTRUCTIONS | /* empty */;
+MATH_INSRUCTION: tIDENTIFIER tEGAL expr tSEMICOLON;
+expr : 
+    expr tADD expr
+  | expr tSOU expr
+  | expr tMUL expr
+  | expr tDIV expr
+  | tIDENTIFIER
+  | tINTEGER
+;
 
 
 
