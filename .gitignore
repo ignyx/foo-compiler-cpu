@@ -1,0 +1,9 @@
+# Lex output
+*.yy.c
+
+# YACC output
+*.tab.c
+*.tab.h
+
+# Compile output
+*.o
