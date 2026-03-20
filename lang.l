@@ -1,33 +1,35 @@
 %{
 #include <stdlib.h>
 #include <stdio.h>
-//#include "calc.tab.h"
+#include "lang.tab.h"
 %}
 
 
 %%
 
-[\t]+ { printf("tTAB"); }
-[ ]+ { printf("tSPACE"); }
-[\n]+ { printf("tLF\n"); }
-const { printf("tCONST"); }
-int { printf("tINT"); }
-main { printf("tMAIN"); }
--?[0-9]+e[0-9]+ { printf("tINTEGER"); }
--?[0-9]+ { printf("tINTEGER"); }
-[A-Za-z0-9_]+ { printf("tIDENTIFIER"); }
-"{" { printf("tBRACKET_LEFT"); }
-"}" { printf("tBRACKET_RIGHT"); }
-"(" { printf("tPARENTHISIS_LEFT"); }
-")" { printf("tPARENTHISIS_RIGHT"); }
-"," { printf("tCOMMA"); }
-";" { printf("tSEMICOLON"); }
-"="	{ printf("tEGAL"); }
-"-"	{ printf("tSOU"); }
-"+"	{ printf("tADD"); }
-"*"	{ printf("tMUL"); }
-"/"	{ printf("tDIV"); }
-. { printf("unknown"); 
+[\t]+ { return tTAB; }
+[ ]+ { return tSPACE; }
+[\n]+ { return tLF; }
+const { return tCONST; }
+int { return tINT; }
+main { return tMAIN; }
+-?[0-9]+e[0-9]+ { return tINTEGER; }
+-?[0-9]+ { return tINTEGER; }
+[A-Za-z0-9_]+ { return tIDENTIFIER; }
+"{" { return tBRACKET_LEFT; }
+"}" { return tBRACKET_RIGHT; }
+"(" { return tPARENTHISIS_LEFT; }
+")" { return tPARENTHISIS_RIGHT; }
+"," { return tCOMMA; }
+";" { return tSEMICOLON; }
+"="	{ return tEGAL; }
+"-"	{ return tSOU; }
+"+"	{ return tADD; }
+"*"	{ return tMUL; }
+"/"	{ return tDIV; }
+. { return tERROR; }
+%%
+
 /*
 printf { printf("tP
 //%option noyywrap
@@ -48,15 +50,16 @@ printf { printf("tP
 	}
 \n	{ return tFL; }
 .	{ return tERROR; }
-*/}
+*/
 
-%%
 
 int yywrap() {
 return 1 ;
 }
 
+/*
 int main () {
   yylex() ;
   return 1 ;
 }
+*/
