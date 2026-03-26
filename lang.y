@@ -13,7 +13,7 @@ struct st_table table;
 %token <number> tINTEGER
 %token <var> tIDENTIFIER
 /* Used to tell appart constants and variables in symbol table */
-%type <number> DECLARE_MODIFIER
+%type <number> DECLARE_MODIFIER Term
 %start START
 
 /* TODO see if this is necessary */
@@ -60,9 +60,17 @@ DivMul :
   | DivMul tDIV Term
   | Term;
 Term :
-    tIDENTIFIER
+    tIDENTIFIER {
+      // TODO
+      $$ = 1; }
   | tINTEGER
-  | tPARENTHISIS_LEFT expr tPARENTHISIS_RIGHT;
+    { // Assign an immediate to the value
+      const addr = st_alloc_imm(&table);
+      printf("AFC %d %d\n", addr, $1);
+      $$ = addr; }
+  | tPARENTHISIS_LEFT expr tPARENTHISIS_RIGHT
+    { // TODO
+      $$ = 1; };
   /* TODO try to do the calculations, store immediates in first two addr */
 ;
 PRINTF: tPRINTF tPARENTHISIS_LEFT tIDENTIFIER tPARENTHISIS_RIGHT tSEMICOLON;
@@ -76,6 +84,7 @@ int main(void) {
   yyparse();
   printf("done parsing FOO lang !\n"); // yydebug=1;
   st_free_table(&table);
+  st_printf(&table);
   return 0;
 }
 
