@@ -14,6 +14,7 @@ void st_init_table(struct st_table* table) {
 
 void st_free_table(struct st_table* table) {
   free(table->locals);
+  // TODO free names
 }
 
 /** Allocate local entry.
@@ -25,12 +26,21 @@ uint32_t st_alloc_local(struct st_table* table, enum st_entry_type type, char* n
   if (table->locals_count >= table->locals_size) {
     // Increase array size
     struct st_entry* new_arr = malloc((table->locals_size + ST_TABLE_INIT_SIZE) * sizeof(struct st_entry));
-    memcpy(table->locals, new_arr, table->locals_size);
+    memcpy(new_arr, table->locals, table->locals_size * sizeof(struct st_entry));
     free(table->locals);
     table->locals = new_arr;
     table->locals_size = table->locals_size + ST_TABLE_INIT_SIZE;
   }
 
+  /*
+  if (name != NULL) {
+    const int name_size = strlen(name);
+    table->locals[table->locals_count].name = malloc(name_size + 1);
+    strcpy(name, table->locals[table->locals_count].name);
+  } else {
+    table->locals[table->locals_count].name = NULL;
+  }
+  */
   table->locals[table->locals_count].name = name;
   table->locals[table->locals_count].addr = table->locals_count;
   table->locals[table->locals_count].type = type;
@@ -56,12 +66,16 @@ struct st_entry* st_find(struct st_table* table, char* name) {
   int i = 0;
 
   while (!found && i < table->locals_count) {
-    if (table->locals[i].name == NULL) continue;
+    if (table->locals[i].name == NULL) {
+      i++;
+      continue;
+    }
 
     if (strcmp(table->locals[i].name, name) == 0) {
       found = 1;
       entry = &(table->locals[i]);
     }
+    i++;
   }
 
   return entry;
