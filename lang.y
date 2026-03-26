@@ -23,6 +23,11 @@ void yyerror(char *s);
 - [ ] Write lexical parser
 - [ ] Write symbol table in separate file (probably using a linked list; in report explain why not redimensional arr)
 - [ ] Print assembly instructions
+
+Symbol table:
+- linked list of struct containing: name, addr, type (const, var, immediate)
+- immediate values are stored in the first two adresses
+
 */
 
 /* recognize `main () { ... }` */
@@ -43,18 +48,20 @@ DECLARE_MODIFIER:
 FUNCTION_INSTRUCTIONS: MATH_INSRUCTION FUNCTION_INSTRUCTIONS | PRINTF FUNCTION_INSTRUCTIONS | /* empty */;
 MATH_INSRUCTION: tIDENTIFIER tEGAL expr tSEMICOLON;
 expr : 
-    expr tADD expr
-  | expr tSOU expr
-  | expr tMUL expr
-  | expr tDIV expr
-  | tIDENTIFIER
+    expr tADD DivMul
+  | expr tSOU DivMul
+  | DivMul;
+DivMul :
+    DivMul tMUL Term
+  | DivMul tDIV Term
+  | Term;
+Term :
+    tIDENTIFIER
   | tINTEGER
+  | tPARENTHISIS_LEFT expr tPARENTHISIS_RIGHT;
+  /* TODO try to do the calculations, store immediates in first two addr */
 ;
 PRINTF: tPRINTF tPARENTHISIS_LEFT tIDENTIFIER tPARENTHISIS_RIGHT tSEMICOLON;
-
-
-
-
 
 %%
 
@@ -62,7 +69,7 @@ void yyerror(char *s) { fprintf(stderr, "%s\n", s); }
 int main(void) {
   printf("parsing stdin in FOO lang!\n"); // yydebug=1;
   yyparse();
-  printf("FOO lang parsed with success!\n"); // yydebug=1;
+  printf("done parsing FOO lang !\n"); // yydebug=1;
   return 0;
 }
 

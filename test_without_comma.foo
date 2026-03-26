@@ -4,7 +4,9 @@ main () {
 
   const myexp = 10e5;
   int toto=-3;
-  toto = toto + -1;
+  int mon_calc = (((toto + foo * myexp - 3)) +1 *4);
 
+
+  toto = toto + -1;
   printf(my_2nd_var);
 }
