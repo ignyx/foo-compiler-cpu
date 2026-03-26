@@ -1,7 +1,10 @@
 %{
 #include <stdlib.h>
 #include <stdio.h>
+#include "symbol_table.h"
 void yyerror(char *s);
+
+struct st_table table;
 %}
 
 %union { int number; char* var; }
@@ -13,6 +16,7 @@ void yyerror(char *s);
 %type <number> DECLARE_MODIFIER
 %start START
 
+/* TODO see if this is necessary */
 %right tEGAL
 %left tADD tSOU
 %left tMUL tDIV
@@ -67,9 +71,11 @@ PRINTF: tPRINTF tPARENTHISIS_LEFT tIDENTIFIER tPARENTHISIS_RIGHT tSEMICOLON;
 
 void yyerror(char *s) { fprintf(stderr, "%s\n", s); }
 int main(void) {
+  st_init_table(&table);
   printf("parsing stdin in FOO lang!\n"); // yydebug=1;
   yyparse();
   printf("done parsing FOO lang !\n"); // yydebug=1;
+  st_free_table(&table);
   return 0;
 }
 
