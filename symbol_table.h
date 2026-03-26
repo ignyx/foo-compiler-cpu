@@ -22,6 +22,7 @@ struct st_table {
 
 void st_init_table(struct st_table* table);
 void st_free_table(struct st_table* table);
+void st_printf(struct st_table* table);
 
 /** Allocate local const.
   Takes ownership of name.

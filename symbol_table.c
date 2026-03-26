@@ -1,4 +1,5 @@
 #include "stdlib.h"
+#include "stdio.h"
 #include "symbol_table.h"
 #include <string.h>
 
@@ -64,4 +65,22 @@ struct st_entry* st_find(struct st_table* table, char* name) {
   }
 
   return entry;
+}
+
+void st_printf(struct st_table* table) {
+  printf("Table locals_count=%d locals_size=%d\n", table->locals_count, table->locals_size);
+  for (int i = 0; i < table->locals_count; i++) {
+    printf("i=%d\t", i);
+    switch (table->locals[i].type) {
+      case ST_IMMEDIATE:
+        printf("type=IMM\n");
+        break;
+      case ST_CONST:
+        printf("type=CONST name=\"%s\"\n", table->locals[i].name);
+        break;
+      case ST_VAR:
+        break;
+        printf("type=VAR   name=\"%s\"\n", table->locals[i].name);
+    }
+  }
 }
