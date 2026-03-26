@@ -1,6 +1,7 @@
 %{
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include "lang.tab.h"
 %}
 
@@ -16,7 +17,11 @@ main { return tMAIN; }
 printf { return tPRINTF; }
 -?[0-9]+e[0-9]+ { return tINTEGER; }
 -?[0-9]+ { yylval.number = atoi(yytext); return tINTEGER; }
-[A-Za-z0-9_]+ { return tIDENTIFIER; }
+[A-Za-z0-9_]+ {
+    yylval.var = malloc(yyleng + 1);
+    strncpy(yylval.var, yytext, yyleng);
+    yylval.var[yyleng] = 0;
+    return tIDENTIFIER; }
 "{" { return tBRACKET_LEFT; }
 "}" { return tBRACKET_RIGHT; }
 "(" { return tPARENTHISIS_LEFT; }
@@ -30,29 +35,6 @@ printf { return tPRINTF; }
 "/"	{ return tDIV; }
 . { return tERROR; }
 %%
-
-/*
-printf { printf("tP
-//%option noyywrap
-[0-9]+	{
-	  yylval.nb = atoi(yytext);
-	  return tNB;
-	}
-"="	{ return tEGAL; }
-"-"	{ return tSOU; }
-"+"	{ return tADD; }
-"*"	{ return tMUL; }
-"/"	{ return tDIV; }
-"("	{ return tPO; }
-")"	{ return tPF; }
-[a-z]	{
-	  yylval.var = yytext[0];
-	  return tID;
-	}
-\n	{ return tFL; }
-.	{ return tERROR; }
-*/
-
 
 int yywrap() {
 return 1 ;
