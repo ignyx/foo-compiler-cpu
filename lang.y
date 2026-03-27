@@ -42,11 +42,10 @@ FUNCTION_DECLARE: DECLARE FUNCTION_DECLARE | /* empty */ ;
 DECLARE: DECLARE_MODIFIER tIDENTIFIER tEGAL expr tSEMICOLON 
   {/* TODO handle case with comma, maybe using yymore() (ctrl+f concat) */ 
     if (st_find(&table, $2) != NULL) yyerror("symbol $2 already declared in context");
-    const uint32_t addr = st_alloc_const(&table, $2);
+    const uint32_t addr = $1 ? st_alloc_var(&table, $2) : st_alloc_const(&table, $2);
     printf("COP %d %d\n", addr, $4);
     };
 DECLARE_MODIFIER: 
-  /* TODO store this data inside the symbol table */
   tCONST { $$=0; }
   | tINT { $$=1; };
 
@@ -81,7 +80,6 @@ Term :
       $$ = addr; }
   | tPARENTHISIS_LEFT expr tPARENTHISIS_RIGHT
     { $$ = $2; };
-  /* TODO try to do the calculations, store immediates in first two addr */
 ;
 PRINTF: tPRINTF tPARENTHISIS_LEFT tIDENTIFIER tPARENTHISIS_RIGHT tSEMICOLON;
 

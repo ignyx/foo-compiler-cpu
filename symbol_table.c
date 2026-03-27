@@ -93,8 +93,8 @@ void st_printf(struct st_table* table) {
         printf("type=CONST name=\"%s\"\n", table->locals[i].name);
         break;
       case ST_VAR:
-        break;
         printf("type=VAR   name=\"%s\"\n", table->locals[i].name);
+        break;
     }
   }
 }
