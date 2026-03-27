@@ -1,0 +1,5 @@
+main() {
+  const my_cte = 42;
+  my_cte = 66;
+  printf(my_cte);
+}

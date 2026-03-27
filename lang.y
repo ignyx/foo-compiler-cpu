@@ -53,6 +53,7 @@ FUNCTION_INSTRUCTIONS: MATH_INSRUCTION FUNCTION_INSTRUCTIONS | PRINTF FUNCTION_I
 MATH_INSRUCTION: tIDENTIFIER tEGAL expr tSEMICOLON
     { const struct st_entry* entry = st_find(&table, $1);
       if (entry == NULL) yyerror("symbol $2 unknown");
+      else if (entry->type == ST_CONST) yyerror("can't modify $2 as it's a constant");
       printf("COP %d %d\n", entry->addr, $3); };
 expr : 
     expr tADD DivMul
