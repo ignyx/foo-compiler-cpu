@@ -24,8 +24,9 @@ struct st_table table;
 %%
 
 /* Steps:
-- [ ] Write lexical parser
-- [ ] Write symbol table in separate file (probably using a linked list; in report explain why not redimensional arr)
+- [X] Write lexical parser
+- [X] Write symbol table in separate file (probably using a linked list; in report explain why not redimensional arr)
+- [ ] Use symbol table in yacc file
 - [ ] Print assembly instructions
 
 Symbol table:
@@ -43,7 +44,12 @@ FUNCTION_DECLARE: DECLARE FUNCTION_DECLARE | /* empty */ ;
 
 /* recognize `const a = 2;` */
 DECLARE: DECLARE_MODIFIER tIDENTIFIER tEGAL expr tSEMICOLON 
-  { printf("AFC %d %d\n", 1, 0 /*$4*/); }; /* TODO handle case with comma, maybe using yymore() (ctrl+f concat) */
+  {/* TODO handle case with comma, maybe using yymore() (ctrl+f concat) */ 
+    if (st_find(&table, $2) != NULL) yyerror("symbol $2 already declared in context");
+    const uint32_t addr = st_alloc_const(&table, $2);
+    printf("COP %d %d\n", addr, 0); // TODO
+    };
+    //printf("AFC %d %d\n", 1, 0 /*$4*/); }; 
 DECLARE_MODIFIER: 
   /* TODO store this data inside the symbol table */
   tCONST { $$=0; }
@@ -65,7 +71,7 @@ Term :
       $$ = 1; }
   | tINTEGER
     { // Assign an immediate to the value
-      const addr = st_alloc_imm(&table);
+      const uint32_t addr = st_alloc_imm(&table);
       printf("AFC %d %d\n", addr, $1);
       $$ = addr; }
   | tPARENTHISIS_LEFT expr tPARENTHISIS_RIGHT
@@ -83,8 +89,8 @@ int main(void) {
   printf("parsing stdin in FOO lang!\n"); // yydebug=1;
   yyparse();
   printf("done parsing FOO lang !\n"); // yydebug=1;
-  st_free_table(&table);
   st_printf(&table);
+  st_free_table(&table);
   return 0;
 }
 
