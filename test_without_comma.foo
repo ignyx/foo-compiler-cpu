@@ -3,7 +3,7 @@ main () {
   int my_2nd_var = 42;
 
   const myexp = 145e5;
-  const myexp = -1e5;
+  const myexp2 = -1e5;
   int toto=-3;
   int mon_calc = (((toto + foo * myexp - 3)) +1 *4);
 
