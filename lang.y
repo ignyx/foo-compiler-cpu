@@ -41,6 +41,7 @@ FUNCTION_DECLARE: DECLARE FUNCTION_DECLARE | /* empty */ ;
 /* recognize `const a = 2;` */
 DECLARE: DECLARE_MODIFIER tIDENTIFIER tEGAL expr tSEMICOLON 
   {/* TODO handle case with comma, maybe using yymore() (ctrl+f concat) */ 
+  {/* TODO handle case without value */ 
     if (st_find(&table, $2) != NULL) yyerror("symbol $2 already declared in context");
     const uint32_t addr = $1 ? st_alloc_var(&table, $2) : st_alloc_const(&table, $2);
     printf("COP %d %d\n", addr, $4);
@@ -89,13 +90,26 @@ PRINTF: tPRINTF tPARENTHISIS_LEFT tIDENTIFIER tPARENTHISIS_RIGHT tSEMICOLON;
 void yyerror(char *s) { fprintf(stderr, "%s\n", s); }
 
 // Allocates an address for the result and prints the ASM instruction.
+// Frees immediate operands and reuses them where possible.
 // Returns the allocated address.
-// PERF: should later be improved to free immediates.
 uint32_t print_arithm_instr(char* op, uint32_t left, uint32_t right) {
-  // Create an immediate for the result
-  const uint32_t addr = st_alloc_imm(&table);
-  printf("%s %d %d %d\n", op, addr, left, right);
-  return addr;
+  // Reuse left-most immediate, or create one if needed
+  uint32_t dest;
+  if (table.locals[left].type == ST_IMMEDIATE) {
+    // reuse consumed left immediate, and free right immediate
+    dest = left;
+    if (table.locals[right].type == ST_IMMEDIATE) st_free_top(&table);
+  } else if (table.locals[right].type == ST_IMMEDIATE) {
+    // reuse consumed immediate
+    dest = right;
+    // don't free;
+  } else {
+    // both operands are var/const so create a new immediate
+    dest = st_alloc_imm(&table);
+  }
+
+  printf("%s %d %d %d\n", op, dest, left, right);
+  return dest;
 }
 
 int main(void) {

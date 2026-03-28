@@ -46,4 +46,8 @@ uint32_t st_alloc_imm(struct st_table* table);
 */
 struct st_entry* st_find(struct st_table* table, char* name);
 
+/** Free top entry. Only apply to immediates.
+*/
+void st_free_top(struct st_table* table);
+
 #endif

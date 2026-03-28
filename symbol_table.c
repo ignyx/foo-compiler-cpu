@@ -98,3 +98,7 @@ void st_printf(struct st_table* table) {
     }
   }
 }
+
+void st_free_top(struct st_table* table) {
+  table->locals_count--;
+}
