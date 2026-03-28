@@ -84,7 +84,10 @@ Term :
   | tPARENTHISIS_LEFT expr tPARENTHISIS_RIGHT
     { $$ = $2; };
 ;
-PRINTF: tPRINTF tPARENTHISIS_LEFT tIDENTIFIER tPARENTHISIS_RIGHT tSEMICOLON;
+PRINTF: tPRINTF tPARENTHISIS_LEFT tIDENTIFIER tPARENTHISIS_RIGHT tSEMICOLON
+    { const struct st_entry* entry = st_find(&table, $3);
+      if (entry == NULL) yyerror("symbol $3 unknown");
+      else printf("PRI %d\n", entry->addr); };
 
 %%
 
