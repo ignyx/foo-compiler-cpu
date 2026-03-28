@@ -38,6 +38,7 @@ printf { return tPRINTF; }
 "+"	{ return tADD; }
 "*"	{ return tMUL; }
 "/"	{ return tDIV; }
+<<EOF>> { return tEOF; }
 . { return tERROR; }
 %%
 
