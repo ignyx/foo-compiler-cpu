@@ -41,10 +41,10 @@ FUNCTION_DECLARE: DECLARE FUNCTION_DECLARE | /* empty */ ;
 /* recognize `const a = 2;` */
 DECLARE: DECLARE_MODIFIER tIDENTIFIER tEGAL expr tSEMICOLON 
   {/* TODO handle case with comma, maybe using yymore() (ctrl+f concat) */ 
-  {/* TODO handle case without value */ 
+   /* TODO handle case without value */ 
     if (st_find(&table, $2) != NULL) yyerror("symbol $2 already declared in context");
-    const uint32_t addr = $1 ? st_alloc_var(&table, $2) : st_alloc_const(&table, $2);
-    printf("COP %d %d\n", addr, $4);
+    const enum st_entry_type type = $1 ? ST_VAR : ST_CONST;
+    st_become_type(&table, type, $2);
     };
 DECLARE_MODIFIER: 
   tCONST { $$=0; }
@@ -55,7 +55,9 @@ MATH_INSRUCTION: tIDENTIFIER tEGAL expr tSEMICOLON
     { const struct st_entry* entry = st_find(&table, $1);
       if (entry == NULL) yyerror("symbol $2 unknown");
       else if (entry->type == ST_CONST) yyerror("can't modify $2 as it's a constant");
-      printf("COP %d %d\n", entry->addr, $3); };
+      printf("COP %d %d\n", entry->addr, $3);
+      if (table.locals[$3].type == ST_IMMEDIATE) st_free_top(&table);
+      };
 expr : 
     expr tADD DivMul
     { $$ = print_arithm_instr("ADD", $1, $3); }

@@ -24,22 +24,16 @@ void st_init_table(struct st_table* table);
 void st_free_table(struct st_table* table);
 void st_printf(struct st_table* table);
 
-/** Allocate local const.
-  Takes ownership of name.
-  @returns Address
-*/
-uint32_t st_alloc_const(struct st_table* table, char* name);
-
-/** Allocate local variable.
-  Takes ownership of name.
-  @returns Address
-*/
-uint32_t st_alloc_var(struct st_table* table, char* name);
-
 /** Allocate immediate value.
   @returns Address
 */
 uint32_t st_alloc_imm(struct st_table* table);
+
+/** Changes the type of the top immediate.
+  Used to reuse an immediate when declaring a var/const.
+  Takes ownership of name.
+*/
+void st_become_type(struct st_table* table, enum st_entry_type type, char* name);
 
 /** Find entry with name.
   @returns NULL if not found. Pointer is valid until stack frame is dropped.
