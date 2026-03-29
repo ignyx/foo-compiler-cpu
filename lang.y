@@ -5,7 +5,7 @@
 void yyerror(char *s);
 uint32_t print_arithm_instr(char* op, uint32_t left, uint32_t right);
 
-struct st_table table;
+static struct st_table table;
 %}
 
 %union { int number; char* var; }
@@ -21,13 +21,8 @@ struct st_table table;
 /* Steps:
 - [X] Write lexical parser
 - [X] Write symbol table in separate file (probably using a linked list; in report explain why not redimensional arr)
-- [ ] Use symbol table in yacc file
-- [ ] Print assembly instructions
-
-Symbol table:
-- linked list of struct containing: name, addr, type (const, var, immediate)
-- immediate values are stored in the first two adresses
-
+- [X] Use symbol table in yacc file
+- [X] Print assembly instructions
 */
 
 /* recognize `main () { ... }` */
@@ -142,11 +137,13 @@ uint32_t print_arithm_instr(char* op, uint32_t left, uint32_t right) {
   return dest;
 }
 
-int main(void) {
+
+
+extern FILE *yyin;
+int compile(FILE* in, FILE* outlst, FILE* outcod, FILE* err) {
+  yyin = in;
   st_init_table(&table);
-  printf("parsing stdin in FOO lang!\n"); // yydebug=1;
   yyparse();
-  printf("done parsing FOO lang !\n"); // yydebug=1;
   st_printf(&table);
   st_free_table(&table);
   return 0;
