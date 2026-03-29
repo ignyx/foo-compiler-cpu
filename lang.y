@@ -13,7 +13,7 @@ struct st_table table;
 %token <number> tINTEGER
 %token <var> tIDENTIFIER
 /* Used to tell appart constants and variables in symbol table */
-%type <number> DECLARE_MODIFIER Term DivMul expr
+%type <number> DECLARE_MODIFIER Term DivMul expr IDENTIFIER_ACU
 %start START
 
 %%
@@ -35,19 +35,45 @@ START : tMAIN tPARENTHISIS_LEFT tPARENTHISIS_RIGHT tBRACKET_LEFT FUNCTION_BODY t
   { return 0; };
 
 FUNCTION_BODY: FUNCTION_DECLARE FUNCTION_INSTRUCTIONS ;
-FUNCTION_DECLARE: DECLARE FUNCTION_DECLARE | /* empty */ ;
+FUNCTION_DECLARE: DECLARE FUNCTION_DECLARE | DECLARE_UNINIT FUNCTION_DECLARE | /* empty */ ;
 
 /* recognize `const a = 2;` */
-DECLARE: DECLARE_MODIFIER tIDENTIFIER tEGAL expr tSEMICOLON 
-  {/* TODO handle case with comma, maybe using yymore() (ctrl+f concat) */ 
-   /* TODO handle case without value */ 
-    if (st_find(&table, $2) != NULL) yyerror("symbol $2 already declared in context");
-    const enum st_entry_type type = $1 ? ST_VAR : ST_CONST;
-    st_become_type(&table, type, $2);
-    };
 DECLARE_MODIFIER: 
   tCONST { $$=0; }
   | tINT { $$=1; };
+// Returns the number of allocated symbols
+IDENTIFIER_ACU:
+    /* empty */
+    { $$ = 0; }
+  | IDENTIFIER_ACU tCOMMA tIDENTIFIER
+    { if (st_find(&table, $3) != NULL) yyerror("symbol $3 already declared in context");
+      st_alloc_imm(&table);
+      // type isn't known at this time but will be overwitten
+      st_become_type(&table, ST_CONST, $3);
+      { $$ = $1 + 1; } };
+DECLARE_UNINIT: DECLARE_MODIFIER tIDENTIFIER IDENTIFIER_ACU tSEMICOLON
+  { if (st_find(&table, $2) != NULL) yyerror("symbol $2 already declared in context");
+    const enum st_entry_type type = $1 ? ST_VAR : ST_CONST;
+    const uint32_t top = st_alloc_imm(&table);
+    st_become_type(&table, type, $2);
+    for (int i = 1; i <= $3; i++) {
+      // correct type
+      table.locals[top - i].type = type;
+    }
+  };
+DECLARE: DECLARE_MODIFIER tIDENTIFIER IDENTIFIER_ACU tEGAL expr tSEMICOLON
+  { // First symbol reuses the immediate value
+    if (st_find(&table, $2) != NULL) yyerror("symbol $2 already declared in context");
+    const enum st_entry_type type = $1 ? ST_VAR : ST_CONST;
+    st_become_type(&table, type, $2);
+
+    // copy value to comma-ed vars
+    for (int i = 1; i <= $3; i++) {
+      printf("COP %d %d\n", $5 - i, $5);
+      // correct type
+      table.locals[$5 - i].type = type;
+    }
+  };
 
 FUNCTION_INSTRUCTIONS: MATH_INSRUCTION FUNCTION_INSTRUCTIONS | PRINTF FUNCTION_INSTRUCTIONS | /* empty */;
 MATH_INSRUCTION: tIDENTIFIER tEGAL expr tSEMICOLON
