@@ -35,6 +35,9 @@ void asm_init_table(struct asm_table* table);
 void asm_free_table(struct asm_table* table);
 // Prints to out in a human-readible ASM listing
 void asm_fprintf(FILE* out, struct asm_table* table);
+// Writes binary to out. Each instruction should fit in 16 bytes.
+void asm_write_bytecode(FILE* out, struct asm_table* table);
+void asm_read_bytecode(FILE* in, struct asm_table* table);
 
 // Appends instruction to table, returns the index.
 uint32_t asm_append(struct asm_table* table, enum asm_op_code op, uint32_t arg0, uint32_t arg1, uint32_t arg2);

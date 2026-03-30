@@ -49,6 +49,26 @@ void asm_fprintf(FILE* out, struct asm_table* table) {
   }
 }
 
+void asm_write_bytecode(FILE* out, struct asm_table* table) {
+  for (int i = 0; i < table->instructions_count; i++) {
+    const struct asm_instr instr = table->instructions[i];
+    fwrite(&instr.op, sizeof(enum asm_op_code), 1, out);
+    fwrite(&instr.arg0, sizeof(uint32_t), 1, out);
+    fwrite(&instr.arg1, sizeof(uint32_t), 1, out);
+    fwrite(&instr.arg2, sizeof(uint32_t), 1, out);
+  }
+}
+
+void asm_read_bytecode(FILE* in, struct asm_table* table) {
+  enum asm_op_code op;
+  uint32_t arg[3];
+  while (!feof(in)) {
+    assert(fread(&op, sizeof(enum asm_op_code), 1, in) == 1);
+    assert(fread(&arg, sizeof(uint32_t), 3, in) == 1);
+    asm_append(table, op, arg[0], arg[1], arg[2]);
+  }
+}
+
 // Appends instruction to table, returns the index.
 uint32_t asm_append(struct asm_table* table, enum asm_op_code op, uint32_t arg0, uint32_t arg1, uint32_t arg2) {
   if (table->instructions_count >= table->instructions_size) {
