@@ -5,7 +5,7 @@
 #include <assert.h>
 
 
-#define ST_TABLE_INIT_SIZE 10
+#define ST_TABLE_INIT_SIZE 2
 
 void st_init_table(struct st_table* table) {
   table->locals = malloc(ST_TABLE_INIT_SIZE * sizeof(struct st_entry));
@@ -26,11 +26,9 @@ static struct st_entry* st_get_top(struct st_table* table) {
 uint32_t st_alloc_imm(struct st_table* table) {
   if (table->locals_count >= table->locals_size) {
     // Increase array size
-    struct st_entry* new_arr = malloc((table->locals_size + ST_TABLE_INIT_SIZE) * sizeof(struct st_entry));
-    memcpy(new_arr, table->locals, table->locals_size * sizeof(struct st_entry));
-    free(table->locals);
-    table->locals = new_arr;
-    table->locals_size = table->locals_size + ST_TABLE_INIT_SIZE;
+    table->locals = realloc(table->locals, (table->locals_size * 2) * sizeof(struct st_entry));
+    assert(table->locals != NULL);
+    table->locals_size = table->locals_size * 2;
   }
 
   table->locals[table->locals_count].name = NULL;
