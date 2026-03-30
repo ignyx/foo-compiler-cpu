@@ -2,10 +2,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "symbol_table.h"
+#include "asm_table.h"
+
 void yyerror(char *s);
-uint32_t print_arithm_instr(char* op, uint32_t left, uint32_t right);
+uint32_t print_arithm_instr(enum asm_op_code op, uint32_t left, uint32_t right);
 
 static struct st_table table;
+static struct asm_table asmt;
 %}
 
 %union { int number; char* var; }
@@ -69,7 +72,7 @@ DECLARE: DECLARE_MODIFIER tIDENTIFIER IDENTIFIER_ACU tEGAL expr tSEMICOLON
 
     // copy value to comma-ed vars
     for (int i = 1; i <= $3; i++) {
-      printf("COP %d %d\n", $5 - i, $5);
+      asm_append(&asmt, ASM_COP, $5 - i, $5, 0);
       // correct type
       table.locals[$5 - i].type = type;
     }
@@ -80,20 +83,20 @@ MATH_INSRUCTION: tIDENTIFIER tEGAL expr tSEMICOLON
     { const struct st_entry* entry = st_find(&table, $1);
       if (entry == NULL) yyerror("symbol $2 unknown");
       else if (entry->type == ST_CONST) yyerror("can't modify $2 as it's a constant");
-      printf("COP %d %d\n", entry->addr, $3);
+      asm_append(&asmt, ASM_COP, entry->addr, $3, 0);
       if (table.locals[$3].type == ST_IMMEDIATE) st_free_top(&table);
       };
 expr : 
     expr tADD DivMul
-    { $$ = print_arithm_instr("ADD", $1, $3); }
+    { $$ = print_arithm_instr(ASM_ADD, $1, $3); }
   | expr tSOU DivMul
-    { $$ = print_arithm_instr("SOU", $1, $3); }
+    { $$ = print_arithm_instr(ASM_SOU, $1, $3); }
   | DivMul;
 DivMul :
     DivMul tMUL Term
-    { $$ = print_arithm_instr("MUL", $1, $3); }
+    { $$ = print_arithm_instr(ASM_MUL, $1, $3); }
   | DivMul tDIV Term
-    { $$ = print_arithm_instr("DIV", $1, $3); }
+    { $$ = print_arithm_instr(ASM_DIV, $1, $3); }
   | Term
     { $$ = $1; };
 Term :
@@ -105,7 +108,7 @@ Term :
   | tINTEGER
     { // Assign an immediate to the value
       const uint32_t addr = st_alloc_imm(&table);
-      printf("AFC %d %d\n", addr, $1);
+      asm_append(&asmt, ASM_AFC, addr, $1, 0);
       $$ = addr; }
   | tPARENTHISIS_LEFT expr tPARENTHISIS_RIGHT
     { $$ = $2; };
@@ -113,7 +116,7 @@ Term :
 PRINTF: tPRINTF tPARENTHISIS_LEFT tIDENTIFIER tPARENTHISIS_RIGHT tSEMICOLON
     { const struct st_entry* entry = st_find(&table, $3);
       if (entry == NULL) yyerror("symbol $3 unknown");
-      else printf("PRI %d\n", entry->addr); };
+      else asm_append(&asmt, ASM_PRI, entry->addr, 0, 0); };
 
 %%
 
@@ -122,7 +125,7 @@ void yyerror(char *s) { fprintf(stderr, "%s\n", s); }
 // Allocates an address for the result and prints the ASM instruction.
 // Frees immediate operands and reuses them where possible.
 // Returns the allocated address.
-uint32_t print_arithm_instr(char* op, uint32_t left, uint32_t right) {
+uint32_t print_arithm_instr(enum asm_op_code op, uint32_t left, uint32_t right) {
   // Reuse left-most immediate, or create one if needed
   uint32_t dest;
   if (table.locals[left].type == ST_IMMEDIATE) {
@@ -138,19 +141,21 @@ uint32_t print_arithm_instr(char* op, uint32_t left, uint32_t right) {
     dest = st_alloc_imm(&table);
   }
 
-  printf("%s %d %d %d\n", op, dest, left, right);
+  asm_append(&asmt, op, dest, left, right);
   return dest;
 }
-
 
 
 extern FILE *yyin;
 int compile(FILE* in, FILE* outlst, FILE* outcod, FILE* err) {
   yyin = in;
   st_init_table(&table);
+  asm_init_table(&asmt);
   yyparse();
   st_printf(&table);
   st_free_table(&table);
+  asm_fprintf(outlst, &asmt);
+  asm_free_table(&asmt);
   return 0;
 }
 
