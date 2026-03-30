@@ -18,11 +18,16 @@ static struct st_table table;
 
 %%
 
-/* Steps:
+/* TODO Steps:
 - [X] Write lexical parser
 - [X] Write symbol table in separate file (probably using a linked list; in report explain why not redimensional arr)
 - [X] Use symbol table in yacc file
 - [X] Print assembly instructions
+- [ ] Rewrite so asm instr are added to tab, then output
+- [ ] If/While
+- [ ] Refactor to use proper I/O streams
+- [ ] Update main.c to take in params (there's a util for that)
+- [ ] Print error line (not prio)
 */
 
 /* recognize `main () { ... }` */
