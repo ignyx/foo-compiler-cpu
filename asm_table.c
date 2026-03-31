@@ -62,11 +62,11 @@ void asm_write_bytecode(FILE* out, struct asm_table* table) {
 void asm_read_bytecode(FILE* in, struct asm_table* table) {
   enum asm_op_code op;
   uint32_t arg[3];
-  while (!feof(in)) {
-    assert(fread(&op, sizeof(enum asm_op_code), 1, in) == 1);
-    assert(fread(&arg, sizeof(uint32_t), 3, in) == 1);
+  while (fread(&op, sizeof(enum asm_op_code), 1, in) == 1) {
+    assert(fread(&arg, sizeof(uint32_t), 3, in) == 3);
     asm_append(table, op, arg[0], arg[1], arg[2]);
   }
+  assert(table->instructions_count > 0);
 }
 
 // Appends instruction to table, returns the index.
