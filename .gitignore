@@ -7,3 +7,5 @@
 
 # Compile output
 *.o
+*.bytecode
+*.lst
