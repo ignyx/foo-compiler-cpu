@@ -16,7 +16,7 @@ static void assert_params_in_bounds(struct asm_instr* instr, int count) {
   }
 }
 
-static int run(struct asm_table* table) {
+static void run(struct asm_table* table) {
   uint32_t memory[MEMORY_SIZE];
   uint32_t pc = 0;
   struct asm_instr* instr;
@@ -72,8 +72,6 @@ static int run(struct asm_table* table) {
         exit(2);
     }
   }
-
-  return 0;
 }
 
 int main(int argc, char** argv) {
