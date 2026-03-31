@@ -24,7 +24,7 @@ static int run(struct asm_table* table) {
   while (pc != table->instructions_count) {
     if (pc > table->instructions_count) {
       fprintf(stderr, "segfault: attempting to read instruction beyond code: pc=0x%x\n", pc);
-      return 1;
+      exit(1);
     }
     instr = &table->instructions[pc];
     pc++;
@@ -69,15 +69,20 @@ static int run(struct asm_table* table) {
         break;
       default:
         fprintf(stderr, "unsupported op 0x%x at pc=0x%x\n", instr->op, pc);
-        return 2;
+        exit(2);
     }
   }
 
   return 0;
 }
 
-int main() {
-  FILE* in = fopen("test.foo.bytecode", "rb");
+int main(int argc, char** argv) {
+  if (argc != 2) {
+    fprintf(stderr, "usage: %s <bytecode_file>\n", argv[0]);
+    return 1;
+  }
+
+  FILE* in = fopen(argv[1], "rb");
   if (in == NULL) {
     perror("couldn't open file");
     return 1;
@@ -88,9 +93,9 @@ int main() {
   asm_read_bytecode(in, &table);
   fclose(in);
 
-  asm_fprintf(stdout, &table);
+  asm_fprintf(stderr, &table);
 
-  printf("Running bytecode (%d instructions) from %s\n", table.instructions_count, "TODO");
+  fprintf(stderr, "Running bytecode (%d instructions) from %s\n", table.instructions_count, argv[1]);
   run(&table);
 
   asm_free_table(&table);
