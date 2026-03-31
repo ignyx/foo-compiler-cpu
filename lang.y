@@ -155,6 +155,7 @@ int compile(FILE* in, FILE* outlst, FILE* outcod, FILE* err) {
   st_printf(&table);
   st_free_table(&table);
   asm_fprintf(outlst, &asmt);
+  asm_write_bytecode(outcod, &asmt);
   asm_free_table(&asmt);
   return 0;
 }
