@@ -9,3 +9,22 @@
 *.o
 *.bytecode
 *.lst
+
+# for Xilinx Vivado|ISE
+# From https://gist.github.com/iDoka/6147ea6cf320f09d7ca39477b090486a
+.Xil/
+.cache/
+fsm_encoding.os
+tab_*/
+webtalk.*
+vivado_pid*.str
+hs_err_pid*
+xelab.*
+xsim.*
+xvlog.*
+*.cache
+*.sim
+*.runs
+*.hw
+*.backup.*
+*.debug
