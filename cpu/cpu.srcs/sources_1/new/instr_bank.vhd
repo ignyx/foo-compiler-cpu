@@ -51,6 +51,7 @@ architecture Behavioral of instr_bank is
      x"06_01_FF_03",
      x"06_00_04_03",
      x"06_00_05_03",
+     x"05_0A_01_00",
      others => (others => '0'));
 begin
     process begin

@@ -59,6 +59,7 @@ architecture Behavioral of processor is
            q_a : out STD_LOGIC_VECTOR (7 downto 0);
            q_b : out STD_LOGIC_VECTOR (7 downto 0));
   end component;
+  signal register_q_a, register_q_b : std_logic_vector (7 downto 0);
   
   signal A_DIEX, B_DIEX, C_DIEX, OP_DIEX: std_logic_vector(7 downto 0);
 
@@ -99,11 +100,12 @@ begin
         w => write_back_MemRE,
         data => B_MemRE,
         rst => reset,
-        clk => clk
-        -- TODO out
+        clk => clk,
+        q_a => register_q_a,
+        q_b => register_q_b
     );
     
-    write_back_MemRE <= '1' when OP_MemRE = x"06" else '0';
+    write_back_MemRE <= '1' when OP_MemRE = x"06" or OP_MemRE = x"05" else '0';
     
     process begin
         wait until rising_edge(clk);
@@ -120,7 +122,13 @@ begin
         OP_EXMem <= OP_DIEX;
         
         A_DIEX <= A_LIDI;
-        B_DIEX <= B_LIDI;
+        
+        if (OP_LIDI = x"06") then
+            B_DIEX <= B_LIDI;
+        else
+            B_DIEX <= register_q_b;
+        end if;
+       -- B_DIEX <= B_LIDI when OP_LIDI = x"06" else register_q_b;
         OP_DIEX <= OP_LIDI;
         
         
