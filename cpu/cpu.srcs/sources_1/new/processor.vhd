@@ -37,6 +37,20 @@ Port ( clk, reset : in STD_LOGIC );
 end processor;
 
 architecture Behavioral of processor is
+  -- Recognized instruction opcodes --
+  subtype cpu_instr_t is std_logic_vector(3 downto 0);
+  constant INSTR_NOP: cpu_instr_t := x"0";
+  constant INSTR_ADD: cpu_instr_t := x"1";
+  constant INSTR_MUL: cpu_instr_t := x"2";
+  constant INSTR_SUB: cpu_instr_t := x"3";
+  constant INSTR_DIV: cpu_instr_t := x"4";
+  constant INSTR_COP: cpu_instr_t := x"5";
+  constant INSTR_AFC: cpu_instr_t := x"6";
+  constant INSTR_LOAD: cpu_instr_t := x"7";
+  constant INSTR_STORE: cpu_instr_t := x"8";
+
+
+
   signal ip : std_logic_vector(7 downto 0);
 
   component instr_bank is
@@ -105,7 +119,7 @@ begin
         q_b => register_q_b
     );
     
-    write_back_MemRE <= '1' when OP_MemRE = x"06" or OP_MemRE = x"05" else '0';
+    write_back_MemRE <= '1' when OP_MemRE = INSTR_AFC or OP_MemRE = INSTR_COP else '0';
     
     process begin
         wait until rising_edge(clk);
@@ -123,7 +137,7 @@ begin
         
         A_DIEX <= A_LIDI;
         
-        if (OP_LIDI = x"06") then
+        if (OP_LIDI = INSTR_AFC) then
             B_DIEX <= B_LIDI;
         else
             B_DIEX <= register_q_b;
