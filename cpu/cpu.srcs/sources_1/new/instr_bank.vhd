@@ -47,6 +47,10 @@ architecture Behavioral of instr_bank is
     -- output from cross-compiler goes here
      x"01_00_01_02",
      x"01_00_01_03",
+     x"06_00_01_00",
+     x"06_01_FF_03",
+     x"06_00_04_03",
+     x"06_00_05_03",
      others => (others => '0'));
 begin
     process begin
