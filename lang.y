@@ -16,7 +16,7 @@ static struct asm_table asmt;
 %token <number> tINTEGER
 %token <var> tIDENTIFIER
 /* Used to tell appart constants and variables in symbol table */
-%type <number> DECLARE_MODIFIER Term DivMul expr IDENTIFIER_ACU BLOCK BLOCK_END CONDITION
+%type <number> DECLARE_MODIFIER Term DivMul expr IDENTIFIER_ACU BLOCK BLOCK_END CONDITION WHILE_START
 %start START
 
 %%
@@ -85,7 +85,12 @@ DECLARE: DECLARE_MODIFIER tIDENTIFIER IDENTIFIER_ACU tEGAL expr tSEMICOLON
     }
   };
 
-BLOCK_INSTRUCTIONS: MATH_INSRUCTION BLOCK_INSTRUCTIONS | PRINTF BLOCK_INSTRUCTIONS | IF BLOCK_INSTRUCTIONS | /* empty */;
+BLOCK_INSTRUCTIONS:
+    MATH_INSRUCTION BLOCK_INSTRUCTIONS
+  | PRINTF BLOCK_INSTRUCTIONS
+  | IF BLOCK_INSTRUCTIONS
+  | WHILE BLOCK_INSTRUCTIONS
+  | /* empty */;
 MATH_INSRUCTION: tIDENTIFIER tEGAL expr tSEMICOLON
     { const struct st_entry* entry = st_find(&table, $1);
       if (entry == NULL) yyerror("symbol $2 unknown");
@@ -126,6 +131,12 @@ PRINTF: tPRINTF tPARENTHISIS_LEFT tIDENTIFIER tPARENTHISIS_RIGHT tSEMICOLON
       else asm_append(&asmt, ASM_PRI, entry->addr, 0, 0); };
 IF: tIF CONDITION BLOCK
     { asm_set_jump_target(&asmt, $2, $3); };
+WHILE: WHILE_START CONDITION BLOCK
+    { asm_append(&asmt, ASM_JMP, $1, 0, 0);
+      asm_set_jump_target(&asmt, $2, $3 + 1); };
+WHILE_START: tWHILE
+    { // Return address of expression start, as it needs to be evaluated at every iteration
+    $$ = asmt.instructions_count; };
 CONDITION: tPARENTHISIS_LEFT expr tPARENTHISIS_RIGHT
     { // return the code address of the jump
     $$ = asm_append(&asmt, ASM_JMF, $2, 0, 0); };
