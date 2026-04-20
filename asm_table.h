@@ -27,8 +27,8 @@ struct asm_instr {
 
 struct asm_table {
   struct asm_instr *instructions;
-  uint32_t instructions_count; // Stack pointer
-  uint32_t instructions_size;  // Initially at 10, increased dynamically.
+  uint32_t instructions_count;
+  uint32_t instructions_size; // Initially at 10, increased dynamically.
 };
 
 void asm_init_table(struct asm_table *table);
