@@ -1,3 +1,3 @@
 #include <stdio.h>
 
-int compile(FILE* in, FILE* outlst, FILE* outcod, FILE* err);
+int compile(FILE *in, FILE *outlst, FILE *outcod, FILE *err);

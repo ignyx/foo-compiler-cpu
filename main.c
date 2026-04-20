@@ -2,8 +2,8 @@
 #include <stdio.h>
 
 int main(void) {
-  FILE* in = fopen("test.foo", "r");
-  FILE* out_bytecode = fopen("test.foo.bytecode", "wb");
+  FILE *in = fopen("test.foo", "r");
+  FILE *out_bytecode = fopen("test.foo.bytecode", "wb");
   compile(in, stdout, out_bytecode, stderr);
   fclose(in);
   fclose(out_bytecode);
