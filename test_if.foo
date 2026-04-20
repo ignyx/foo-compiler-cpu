@@ -1,0 +1,12 @@
+main(){
+  int a,b = 0;
+  if (1) {
+    a = 42;
+    if (a) {
+      int c = 2;
+      b = c;
+    }
+  }
+  printf(a);
+  printf(b);
+}
