@@ -10,6 +10,7 @@ void st_init_table(struct st_table *table) {
   table->locals = malloc(ST_TABLE_INIT_SIZE * sizeof(struct st_entry));
   table->locals_size = ST_TABLE_INIT_SIZE;
   table->locals_count = 0;
+  table->depth = 0;
 }
 
 void st_free_table(struct st_table *table) {
@@ -34,6 +35,7 @@ uint32_t st_alloc_imm(struct st_table *table) {
   table->locals[table->locals_count].name = NULL;
   table->locals[table->locals_count].addr = table->locals_count;
   table->locals[table->locals_count].type = ST_IMMEDIATE;
+  table->locals[table->locals_count].depth = table->depth;
 
   return table->locals_count++;
 }
@@ -69,8 +71,8 @@ struct st_entry *st_find(struct st_table *table, char *name) {
 }
 
 void st_printf(struct st_table *table) {
-  printf("Table locals_count=%d locals_size=%d\n", table->locals_count,
-         table->locals_size);
+  printf("Table locals_count=%d locals_size=%d depth=%d\n", table->locals_count,
+         table->locals_size, table->depth);
   for (int i = 0; i < table->locals_count; i++) {
     printf("i=%d\t", i);
     switch (table->locals[i].type) {
@@ -78,10 +80,12 @@ void st_printf(struct st_table *table) {
       printf("type=IMM\n");
       break;
     case ST_CONST:
-      printf("type=CONST name=\"%s\"\n", table->locals[i].name);
+      printf("type=CONST depth=%d name=\"%s\"\n", table->locals[i].depth,
+             table->locals[i].name);
       break;
     case ST_VAR:
-      printf("type=VAR   name=\"%s\"\n", table->locals[i].name);
+      printf("type=VAR   depth=%d name=\"%s\"\n", table->locals[i].depth,
+             table->locals[i].name);
       break;
     }
   }
@@ -90,4 +94,12 @@ void st_printf(struct st_table *table) {
 void st_free_top(struct st_table *table) {
   assert(st_get_top(table)->type == ST_IMMEDIATE);
   table->locals_count--;
+}
+
+void st_increase_depth(struct st_table *table) { table->depth++; }
+
+void st_decrease_depth_free(struct st_table *table) {
+  table->depth--;
+  while (table->locals_count > 0 && st_get_top(table)->depth > table->depth)
+    table->locals_count--;
 }
