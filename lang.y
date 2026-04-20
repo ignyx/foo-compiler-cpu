@@ -12,11 +12,11 @@ static struct asm_table asmt;
 %}
 
 %union { int number; char* var; }
-%token tEOF tCONST tINT tMAIN tBRACKET_LEFT tBRACKET_RIGHT tPARENTHISIS_LEFT tPARENTHISIS_RIGHT tCOMMA tSEMICOLON tEGAL tSOU tADD tMUL tDIV tERROR tPRINTF
+%token tEOF tCONST tINT tMAIN tIF tWHILE tBRACKET_LEFT tBRACKET_RIGHT tPARENTHISIS_LEFT tPARENTHISIS_RIGHT tCOMMA tSEMICOLON tEGAL tSOU tADD tMUL tDIV tERROR tPRINTF
 %token <number> tINTEGER
 %token <var> tIDENTIFIER
 /* Used to tell appart constants and variables in symbol table */
-%type <number> DECLARE_MODIFIER Term DivMul expr IDENTIFIER_ACU
+%type <number> DECLARE_MODIFIER Term DivMul expr IDENTIFIER_ACU BLOCK BLOCK_END CONDITION
 %start START
 
 %%
@@ -37,10 +37,15 @@ static struct asm_table asmt;
 START : tMAIN tPARENTHISIS_LEFT tPARENTHISIS_RIGHT BLOCK tEOF
   { return 0; };
 
-BLOCK: BLOCK_START BLOCK_DECLARE BLOCK_INSTRUCTIONS BLOCK_END;
+BLOCK: BLOCK_START BLOCK_DECLARE BLOCK_INSTRUCTIONS BLOCK_END
+    { $$ = $4; };
 BLOCK_DECLARE: DECLARE BLOCK_DECLARE | DECLARE_UNINIT BLOCK_DECLARE | /* empty */ ;
-BLOCK_START: tBRACKET_LEFT { st_increase_depth(&table); };
-BLOCK_END: tBRACKET_RIGHT { st_decrease_depth_free(&table); };
+BLOCK_START: tBRACKET_LEFT
+    { st_increase_depth(&table); };
+BLOCK_END: tBRACKET_RIGHT
+    { st_decrease_depth_free(&table);
+      // return address of next instruction
+      $$ = asmt.instructions_count; };
 
 /* recognize `const a = 2;` */
 DECLARE_MODIFIER: 
@@ -119,6 +124,11 @@ PRINTF: tPRINTF tPARENTHISIS_LEFT tIDENTIFIER tPARENTHISIS_RIGHT tSEMICOLON
     { const struct st_entry* entry = st_find(&table, $3);
       if (entry == NULL) yyerror("symbol $3 unknown");
       else asm_append(&asmt, ASM_PRI, entry->addr, 0, 0); };
+IF: tIF CONDITION BLOCK
+    { asm_set_jump_target(&asmt, $2, $3); };
+CONDITION: tPARENTHISIS_LEFT expr tPARENTHISIS_RIGHT
+    { // return the code address of the jump
+    $$ = asm_append(&asmt, ASM_JMF, $2, 0, 0); };
 
 %%
 

@@ -16,6 +16,7 @@ const { return tCONST; }
 int { return tINT; }
 main { return tMAIN; }
 printf { return tPRINTF; }
+if { return tIF; }
 -?[0-9]+e[0-9]+ { 
     int mantiss, exponent;
     sscanf(yytext, "%de%d", &mantiss, &exponent);
