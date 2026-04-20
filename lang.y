@@ -26,7 +26,7 @@ static struct asm_table asmt;
 - [X] Write symbol table in separate file (probably using a linked list; in report explain why not redimensional arr)
 - [X] Use symbol table in yacc file
 - [X] Print assembly instructions
-- [ ] Rewrite so asm instr are added to tab, then output
+- [X] Rewrite so asm instr are added to tab, then output
 - [ ] If/While
 - [ ] Refactor to use proper I/O streams
 - [ ] Update main.c to take in params (there's a util for that)
@@ -34,11 +34,13 @@ static struct asm_table asmt;
 */
 
 /* recognize `main () { ... }` */
-START : tMAIN tPARENTHISIS_LEFT tPARENTHISIS_RIGHT tBRACKET_LEFT FUNCTION_BODY tBRACKET_RIGHT tEOF
+START : tMAIN tPARENTHISIS_LEFT tPARENTHISIS_RIGHT BLOCK tEOF
   { return 0; };
 
-FUNCTION_BODY: FUNCTION_DECLARE FUNCTION_INSTRUCTIONS ;
-FUNCTION_DECLARE: DECLARE FUNCTION_DECLARE | DECLARE_UNINIT FUNCTION_DECLARE | /* empty */ ;
+BLOCK: BLOCK_START BLOCK_DECLARE BLOCK_INSTRUCTIONS BLOCK_END;
+BLOCK_DECLARE: DECLARE BLOCK_DECLARE | DECLARE_UNINIT BLOCK_DECLARE | /* empty */ ;
+BLOCK_START: tBRACKET_LEFT { st_increase_depth(&table); };
+BLOCK_END: tBRACKET_RIGHT { st_decrease_depth_free(&table); };
 
 /* recognize `const a = 2;` */
 DECLARE_MODIFIER: 
@@ -78,7 +80,7 @@ DECLARE: DECLARE_MODIFIER tIDENTIFIER IDENTIFIER_ACU tEGAL expr tSEMICOLON
     }
   };
 
-FUNCTION_INSTRUCTIONS: MATH_INSRUCTION FUNCTION_INSTRUCTIONS | PRINTF FUNCTION_INSTRUCTIONS | /* empty */;
+BLOCK_INSTRUCTIONS: MATH_INSRUCTION BLOCK_INSTRUCTIONS | PRINTF BLOCK_INSTRUCTIONS | IF BLOCK_INSTRUCTIONS | /* empty */;
 MATH_INSRUCTION: tIDENTIFIER tEGAL expr tSEMICOLON
     { const struct st_entry* entry = st_find(&table, $1);
       if (entry == NULL) yyerror("symbol $2 unknown");
