@@ -5,7 +5,7 @@ C-style language.
 ```bash
 make clean
 make
-./main.out # implicitly with test.foo as arg
+./main.out test.foo
 ./interpreter.o test.foo.bytecode
 ```
 

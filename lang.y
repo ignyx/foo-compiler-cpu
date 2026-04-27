@@ -29,7 +29,7 @@ static struct asm_table asmt;
 - [X] Rewrite so asm instr are added to tab, then output
 - [X] If/While
 - [X] Refactor to use proper I/O streams
-- [ ] Update main.c to take in params (there's a util for that)
+- [X] Update main.c to take in params (there's a util for that)
 - [ ] Print error line (not prio)
 */
 
