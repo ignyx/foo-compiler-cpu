@@ -15,12 +15,11 @@ void asm_free_table(struct asm_table *table) { free(table->instructions); }
 
 struct asm_op_triplet {
   enum asm_op_code op;
-  char name[4];
+  char name[6];
   uint32_t params;
 };
 static const struct asm_op_triplet ASM_OPS[] = {
-    {ASM_PRI, "NUL", 0}, // Because spec doesn't include any instruction with
-                         // opcode 0
+    {ASM_NOP, "NOP", 0},
     {ASM_ADD, "ADD", 3},
     {ASM_MUL, "MUL", 3},
     {ASM_SOU, "SOU", 3},
@@ -32,7 +31,9 @@ static const struct asm_op_triplet ASM_OPS[] = {
     {ASM_INF, "INF", 3},
     {ASM_SUP, "SUP", 3},
     {ASM_EQU, "EQU", 3},
-    {ASM_PRI, "PRI", 1}};
+    {ASM_PRI, "PRI", 1},
+    {ASM_LOAD, "LOAD", 2},
+    {ASM_STORE, "STORE", 2}};
 
 // Prints to out in a human-readible ASM listing
 void asm_fprintf(FILE *out, struct asm_table *table) {

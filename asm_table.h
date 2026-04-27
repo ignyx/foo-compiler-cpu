@@ -4,6 +4,7 @@
 #ifndef ASM_TABLE
 
 enum asm_op_code {
+  ASM_NOP = 0x0,
   ASM_ADD = 0x1,
   ASM_MUL = 0x2,
   ASM_SOU = 0x3,
@@ -15,7 +16,9 @@ enum asm_op_code {
   ASM_INF = 0x9,
   ASM_SUP = 0xA,
   ASM_EQU = 0xB,
-  ASM_PRI = 0xC
+  ASM_PRI = 0xC,
+  ASM_LOAD = 0xD,
+  ASM_STORE = 0xE
 };
 
 struct asm_instr {

@@ -73,6 +73,14 @@ static void run(struct asm_table *table) {
       assert_params_in_bounds(instr, 1);
       printf("%d\n", memory[instr->arg0]);
       break;
+    case ASM_LOAD:
+      assert_params_in_bounds(instr, 2);
+      memory[instr->arg0] = memory[instr->arg1];
+      break;
+    case ASM_STORE:
+      assert_params_in_bounds(instr, 2);
+      memory[instr->arg1] = memory[instr->arg0];
+      break;
     default:
       fprintf(stderr, "unsupported op 0x%x at pc=0x%x\n", instr->op, pc);
       exit(2);
