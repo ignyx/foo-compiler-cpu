@@ -20,6 +20,12 @@ static void assert_params_in_bounds(struct asm_instr *instr, int count) {
   }
 }
 
+static void mem_dump(uint32_t memory[MEMORY_SIZE]) {
+  for (int i = 0; i < MEMORY_SIZE; i++) {
+    printf("%d\t:\t%d\n", i, memory[i]);
+  }
+}
+
 static void run(struct asm_table *table) {
   uint32_t memory[MEMORY_SIZE];
   uint32_t pc = 0;
