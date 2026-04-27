@@ -87,6 +87,7 @@ DECLARE: DECLARE_MODIFIER tIDENTIFIER IDENTIFIER_ACU tEGAL expr tSEMICOLON
 
 BLOCK_INSTRUCTIONS:
     MATH_INSRUCTION BLOCK_INSTRUCTIONS
+  | POINTER_AFFECT BLOCK_INSTRUCTIONS
   | PRINTF BLOCK_INSTRUCTIONS
   | IF BLOCK_INSTRUCTIONS
   | WHILE BLOCK_INSTRUCTIONS
@@ -98,6 +99,12 @@ MATH_INSRUCTION: tIDENTIFIER tEGAL expr tSEMICOLON
       asm_append(&asmt, ASM_COP, entry->addr, $3, 0);
       if (table.locals[$3].type == ST_IMMEDIATE) st_free_top(&table);
       };
+POINTER_AFFECT: tMUL Term tEGAL expr tSEMICOLON
+    { // store and free immediates
+      asm_append(&asmt, ASM_STORE, $2, $4, 0);
+      if (table.locals[$4].type == ST_IMMEDIATE) st_free_top(&table);
+      if (table.locals[$2].type == ST_IMMEDIATE) st_free_top(&table);
+    }
 expr :
     expr tADD DivMul
     { $$ = print_arithm_instr(ASM_ADD, $1, $3); }
