@@ -75,10 +75,12 @@ static void run(struct asm_table *table) {
       break;
     case ASM_LOAD:
       assert_params_in_bounds(instr, 2);
+      assert(memory[instr->arg1] < MEMORY_SIZE);
       memory[instr->arg0] = memory[memory[instr->arg1]];
       break;
     case ASM_STORE:
       assert_params_in_bounds(instr, 2);
+      assert(memory[instr->arg1] < MEMORY_SIZE);
       memory[memory[instr->arg0]] = memory[instr->arg1];
       break;
     default:

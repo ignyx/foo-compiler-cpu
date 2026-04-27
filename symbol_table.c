@@ -100,6 +100,10 @@ void st_increase_depth(struct st_table *table) { table->depth++; }
 
 void st_decrease_depth_free(struct st_table *table) {
   table->depth--;
-  while (table->locals_count > 0 && st_get_top(table)->depth > table->depth)
+  while (table->locals_count > 0 && st_get_top(table)->depth > table->depth) {
+    // finding an immediate means it wasn't freed when it was supposed to...
+    // st_printf(table);
+    assert(st_get_top(table)->type != ST_IMMEDIATE);
     table->locals_count--;
+  }
 }
