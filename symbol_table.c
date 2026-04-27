@@ -18,7 +18,7 @@ void st_free_table(struct st_table *table) {
   // TODO free names
 }
 
-static struct st_entry *st_get_top(struct st_table *table) {
+struct st_entry *st_get_top(struct st_table *table) {
   assert(table->locals_count > 0);
   return &(table->locals[table->locals_count - 1]);
 }

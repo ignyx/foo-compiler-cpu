@@ -39,6 +39,9 @@ void st_become_type(struct st_table *table, enum st_entry_type type,
 */
 struct st_entry *st_find(struct st_table *table, char *name);
 
+/** Return top entry */
+struct st_entry *st_get_top(struct st_table *table);
+
 /** Free top entry. Only apply to immediates.
  */
 void st_free_top(struct st_table *table);
