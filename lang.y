@@ -154,7 +154,9 @@ IF: tIF CONDITION BLOCK
     { asm_set_jump_target(&asmt, $2, $3); };
 WHILE: WHILE_START CONDITION BLOCK
     { asm_append(&asmt, ASM_JMP, $1, 0, 0);
-      asm_set_jump_target(&asmt, $2, $3 + 1); };
+      asm_set_jump_target(&asmt, $2, $3 + 1);
+      // free condition immediate
+      if (st_get_top(&table)->type == ST_IMMEDIATE) st_free_top(&table); };
 WHILE_START: tWHILE
     { // Return address of expression start, as it needs to be evaluated at every iteration
     $$ = asmt.instructions_count; };
