@@ -1,0 +1,14 @@
+main() {
+  const a = 42;
+  int b  = &a;
+  int out;
+
+  out = &a;
+  printf(out);
+  out = b;
+  printf(out);
+  out = *b;
+  printf(out);
+  out = *(&a);
+  printf(out);
+}

@@ -12,7 +12,7 @@ static struct asm_table asmt;
 %}
 
 %union { int number; char* var; }
-%token tEOF tCONST tINT tMAIN tIF tWHILE tBRACKET_LEFT tBRACKET_RIGHT tPARENTHISIS_LEFT tPARENTHISIS_RIGHT tCOMMA tSEMICOLON tEGAL tSOU tADD tMUL tDIV tERROR tPRINTF
+%token tEOF tCONST tINT tMAIN tIF tWHILE tBRACKET_LEFT tBRACKET_RIGHT tPARENTHISIS_LEFT tPARENTHISIS_RIGHT tCOMMA tSEMICOLON tEGAL tSOU tADD tMUL tDIV tREF tERROR tPRINTF
 %token <number> tINTEGER
 %token <var> tIDENTIFIER
 /* Used to tell appart constants and variables in symbol table */
@@ -98,11 +98,16 @@ MATH_INSRUCTION: tIDENTIFIER tEGAL expr tSEMICOLON
       asm_append(&asmt, ASM_COP, entry->addr, $3, 0);
       if (table.locals[$3].type == ST_IMMEDIATE) st_free_top(&table);
       };
-expr : 
+expr :
     expr tADD DivMul
     { $$ = print_arithm_instr(ASM_ADD, $1, $3); }
   | expr tSOU DivMul
     { $$ = print_arithm_instr(ASM_SOU, $1, $3); }
+  | tMUL expr
+    { // Load the value into an immediate
+      const uint32_t addr = st_alloc_imm(&table);
+      asm_append(&asmt, ASM_LOAD, addr, $2, 0);
+      $$ = addr; }
   | DivMul;
 DivMul :
     DivMul tMUL Term
@@ -112,7 +117,14 @@ DivMul :
   | Term
     { $$ = $1; };
 Term :
-    tIDENTIFIER
+    tREF tIDENTIFIER
+    { // store the address as an immediate and return it
+      const struct st_entry* entry = st_find(&table, $2);
+      if (entry == NULL) yyerror("symbol $2 unknown");
+      const uint32_t addr = st_alloc_imm(&table);
+      asm_append(&asmt, ASM_AFC, addr, entry->addr, 0);
+      $$ = addr; }
+  | tIDENTIFIER
     { // return address
       const struct st_entry* entry = st_find(&table, $1);
       if (entry == NULL) yyerror("symbol $2 unknown");

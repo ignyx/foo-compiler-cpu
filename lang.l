@@ -40,6 +40,7 @@ while { return tWHILE; }
 "+"	{ return tADD; }
 "*"	{ return tMUL; }
 "/"	{ return tDIV; }
+"&" { return tREF; }
 <<EOF>> { return tEOF; }
 . { return tERROR; }
 %%
