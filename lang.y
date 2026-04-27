@@ -151,7 +151,9 @@ PRINTF: tPRINTF tPARENTHISIS_LEFT tIDENTIFIER tPARENTHISIS_RIGHT tSEMICOLON
       if (entry == NULL) yyerror("symbol $3 unknown");
       else asm_append(&asmt, ASM_PRI, entry->addr, 0, 0); };
 IF: tIF CONDITION BLOCK
-    { asm_set_jump_target(&asmt, $2, $3); };
+    { asm_set_jump_target(&asmt, $2, $3);
+      // free condition immediate
+      if (st_get_top(&table)->type == ST_IMMEDIATE) st_free_top(&table); };
 WHILE: WHILE_START CONDITION BLOCK
     { asm_append(&asmt, ASM_JMP, $1, 0, 0);
       asm_set_jump_target(&asmt, $2, $3 + 1);
