@@ -2,7 +2,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
-#define MEMORY_SIZE 16
+#define MEMORY_SIZE 32
 
 static void assert_params_in_bounds(struct asm_instr *instr, int count) {
   uint32_t faulty_address = 0;
