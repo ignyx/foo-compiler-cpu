@@ -27,8 +27,8 @@ static struct asm_table asmt;
 - [X] Use symbol table in yacc file
 - [X] Print assembly instructions
 - [X] Rewrite so asm instr are added to tab, then output
-- [ ] If/While
-- [ ] Refactor to use proper I/O streams
+- [X] If/While
+- [X] Refactor to use proper I/O streams
 - [ ] Update main.c to take in params (there's a util for that)
 - [ ] Print error line (not prio)
 */

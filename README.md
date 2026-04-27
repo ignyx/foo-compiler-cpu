@@ -5,7 +5,8 @@ C-style language.
 ```bash
 make clean
 make
-./main.out
+./main.out # implicitly with test.foo as arg
+./interpreter.o test.foo.bytecode
 ```
 
 Features:
@@ -14,11 +15,11 @@ Features:
 - [X] Symbol table
 - [X] Perf: reuse allocated immediates where possible, to reduce `COP` instructions
 - [X] Multi-var declarations: `const foo, bar = (-1e5 - 3) * 3;`
-- [ ] Output human readable ASM and coded version
+- [X] Output human-readable ASM and bytecode
 - [ ] Practical error handling
 - [ ] Enhanced error handling
-- [ ] if/while
+- [X] if/while
 - [ ] Function calling
-- [ ] Pointers (add `LOAD`/`STORE` instructions`)
-- [ ] Interpreter (for coded version, supports branching)
+- [X] Pointers (add `LOAD`/`STORE` instructions)
+- [X] Interpreter (for coded version, supports branching)
 - [ ] Cross-assembler
