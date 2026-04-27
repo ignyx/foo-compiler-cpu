@@ -77,7 +77,7 @@ void st_printf(struct st_table *table) {
     printf("i=%d\t", i);
     switch (table->locals[i].type) {
     case ST_IMMEDIATE:
-      printf("type=IMM\n");
+      printf("type=IMM   depth=%d\n", table->locals[i].depth);
       break;
     case ST_CONST:
       printf("type=CONST depth=%d name=\"%s\"\n", table->locals[i].depth,
