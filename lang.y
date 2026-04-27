@@ -103,17 +103,19 @@ expr :
     { $$ = print_arithm_instr(ASM_ADD, $1, $3); }
   | expr tSOU DivMul
     { $$ = print_arithm_instr(ASM_SOU, $1, $3); }
-  | tMUL expr
-    { // Load the value into an immediate
-      const uint32_t addr = st_alloc_imm(&table);
-      asm_append(&asmt, ASM_LOAD, addr, $2, 0);
-      $$ = addr; }
   | DivMul;
 DivMul :
     DivMul tMUL Term
     { $$ = print_arithm_instr(ASM_MUL, $1, $3); }
   | DivMul tDIV Term
     { $$ = print_arithm_instr(ASM_DIV, $1, $3); }
+  | tMUL Term
+    { // Load the value into an immediate.
+      // Re-use immediate from the address, or allocate a new one.
+      // Example: `*(a+2)` (immediate from the sum) vs `*a` (no immediate because `a` is a variable).
+      const uint32_t addr = table.locals[$2].type == ST_IMMEDIATE ? $2 : st_alloc_imm(&table);
+      asm_append(&asmt, ASM_LOAD, addr, $2, 0);
+      $$ = addr; }
   | Term
     { $$ = $1; };
 Term :
