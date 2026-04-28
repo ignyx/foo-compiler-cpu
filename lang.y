@@ -5,6 +5,7 @@
 #include "asm_table.h"
 
 void yyerror(char *s);
+static void symbol_error(char *symbol, char *message);
 uint32_t print_arithm_instr(enum asm_op_code op, uint32_t left, uint32_t right);
 extern int get_line_count(); // from lex
 
@@ -62,13 +63,13 @@ IDENTIFIER_ACU:
     /* empty */
     { $$ = 0; }
   | IDENTIFIER_ACU tCOMMA tIDENTIFIER
-    { if (st_find(&table, $3) != NULL) yyerror("symbol $3 already declared in context");
+    { if (st_find(&table, $3) != NULL) symbol_error($3, "is already declared, can't redeclare");
       st_alloc_imm(&table);
       // type isn't known at this time but will be overwitten
       st_become_type(&table, ST_CONST, $3);
       { $$ = $1 + 1; } };
 DECLARE_UNINIT: DECLARE_MODIFIER tIDENTIFIER IDENTIFIER_ACU tSEMICOLON
-  { if (st_find(&table, $2) != NULL) yyerror("symbol $2 already declared in context");
+  { if (st_find(&table, $2) != NULL) symbol_error($2, "is already declared, can't redeclare");
     const enum st_entry_type type = $1 ? ST_VAR : ST_CONST;
     const uint32_t top = st_alloc_imm(&table);
     st_become_type(&table, type, $2);
@@ -79,7 +80,7 @@ DECLARE_UNINIT: DECLARE_MODIFIER tIDENTIFIER IDENTIFIER_ACU tSEMICOLON
   };
 DECLARE: DECLARE_MODIFIER tIDENTIFIER IDENTIFIER_ACU tEGAL expr tSEMICOLON
   { // First symbol reuses the immediate value
-    if (st_find(&table, $2) != NULL) yyerror("symbol $2 already declared in context");
+    if (st_find(&table, $2) != NULL) symbol_error($2, "is already declared, can't redeclare");
     const enum st_entry_type type = $1 ? ST_VAR : ST_CONST;
     st_become_type(&table, type, $2);
 
@@ -103,8 +104,8 @@ ERROR_INSTRUCTION:
   error tSEMICOLON { yyerror("couldn't parse instruction, see above"); }
 MATH_INSRUCTION: tIDENTIFIER tEGAL expr tSEMICOLON
     { const struct st_entry* entry = st_find(&table, $1);
-      if (entry == NULL) yyerror("symbol $2 unknown");
-      else if (entry->type == ST_CONST) yyerror("can't modify $2 as it's a constant");
+      if (entry == NULL) symbol_error($1, "is an undeclared identifier");
+      else if (entry->type == ST_CONST) symbol_error($1, "is a constant, can't modify it");
       else asm_append(&asmt, ASM_COP, entry->addr, $3, 0);
       if (table.locals[$3].type == ST_IMMEDIATE) st_free_top(&table);
       };
@@ -139,13 +140,13 @@ Term :
     { // store the address as an immediate and return it
       const struct st_entry* entry = st_find(&table, $2);
       const uint32_t addr = st_alloc_imm(&table);
-      if (entry == NULL) yyerror("symbol $2 unknown");
+      if (entry == NULL) symbol_error($2, "is an undeclared identifier");
       else asm_append(&asmt, ASM_AFC, addr, entry->addr, 0);
       $$ = addr; }
   | tIDENTIFIER
     { // return address
       const struct st_entry* entry = st_find(&table, $1);
-      if (entry == NULL) yyerror("symbol $2 unknown");
+      if (entry == NULL) symbol_error($1, "is an undeclared identifier");
       $$ = entry ? entry->addr : 999; }
   | tINTEGER
     { // Assign an immediate to the value
@@ -157,7 +158,7 @@ Term :
 ;
 PRINTF: tPRINTF tPARENTHISIS_LEFT tIDENTIFIER tPARENTHISIS_RIGHT tSEMICOLON
     { const struct st_entry* entry = st_find(&table, $3);
-      if (entry == NULL) yyerror("symbol $3 unknown");
+      if (entry == NULL) symbol_error($3, "is an undeclared identifier");
       else asm_append(&asmt, ASM_PRI, entry->addr, 0, 0); };
 IF: tIF CONDITION BLOCK
     { asm_set_jump_target(&asmt, $2, $3);
@@ -183,6 +184,11 @@ void yyerror(char *s) {
   error_occured = 1;
   fprintf(yyerr, "error line %d: %s\n", get_line_count(), s);
   // st_printf(&table);
+}
+
+static void symbol_error(char *symbol, char *message) {
+  error_occured = 1;
+  fprintf(yyerr, "error line %d: %s %s\n", get_line_count(), symbol, message);
 }
 
 // Allocates an address for the result and prints the ASM instruction.
