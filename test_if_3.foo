@@ -1,0 +1,16 @@
+main(){
+  int a,b = 0;
+  if (2 > 1) {
+    a = 42;
+    if (a < 42) {
+      int c = 2;
+      b = c;
+    }
+  }
+  printf(a);
+  printf(b);
+  if (a == 42) {
+    const out = 4242;
+    printf(out);
+  }
+}

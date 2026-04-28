@@ -16,7 +16,7 @@ static struct asm_table asmt;
 %}
 
 %union { int number; char* var; }
-%token tEOF tCONST tINT tMAIN tIF tWHILE tBRACKET_LEFT tBRACKET_RIGHT tPARENTHISIS_LEFT tPARENTHISIS_RIGHT tCOMMA tSEMICOLON tASSIGN tSOU tADD tMUL tDIV tREF tERROR tPRINTF
+%token tEOF tCONST tINT tMAIN tIF tWHILE tBRACKET_LEFT tBRACKET_RIGHT tPARENTHISIS_LEFT tPARENTHISIS_RIGHT tCOMMA tSEMICOLON tASSIGN tSOU tADD tMUL tDIV tEQUAL tLT tGT tREF tERROR tPRINTF
 %token <number> tINTEGER
 %token <var> tIDENTIFIER
 /* Used to tell appart constants and variables in symbol table */
@@ -119,7 +119,15 @@ POINTER_AFFECT: tMUL Term tASSIGN expr tSEMICOLON
       if (table.locals[$2].type == ST_IMMEDIATE) st_free_top(&table);
     }
 expr :
-    arithmetic
+    // Note: Can't compare an expr to an expr: `1 < 2 < 3`.
+    // This is intentional to prevent unexpected behavior.
+    arithmetic tLT arithmetic
+    { $$ = print_arithm_instr(ASM_INF, $1, $3); }
+  |  arithmetic tGT arithmetic
+    { $$ = print_arithm_instr(ASM_SUP, $1, $3); }
+  |  arithmetic tEQUAL arithmetic
+    { $$ = print_arithm_instr(ASM_EQU, $1, $3); }
+  |  arithmetic
     { $$ = $1; };
 arithmetic:
     arithmetic tADD DivMul

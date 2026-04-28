@@ -74,6 +74,18 @@ static void run(struct asm_table *table) {
       if (memory[instr->arg0] == 0)
         pc = instr->arg1;
       break;
+    case ASM_INF:
+      assert_params_in_bounds(instr, 3);
+      memory[instr->arg0] = memory[instr->arg1] < memory[instr->arg2] ? 1 : 0;
+      break;
+    case ASM_SUP:
+      assert_params_in_bounds(instr, 3);
+      memory[instr->arg0] = memory[instr->arg1] > memory[instr->arg2] ? 1 : 0;
+      break;
+    case ASM_EQU:
+      assert_params_in_bounds(instr, 3);
+      memory[instr->arg0] = memory[instr->arg1] == memory[instr->arg2] ? 1 : 0;
+      break;
     // TODO INF SUP EQU
     case ASM_PRI:
       assert_params_in_bounds(instr, 1);

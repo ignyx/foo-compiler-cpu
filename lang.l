@@ -37,11 +37,14 @@ while { return tWHILE; }
 ")" { return tPARENTHISIS_RIGHT; }
 "," { return tCOMMA; }
 ";" { return tSEMICOLON; }
+"==" { return tEQUAL; }
 "="	{ return tASSIGN; }
 "-"	{ return tSOU; }
 "+"	{ return tADD; }
 "*"	{ return tMUL; }
 "/"	{ return tDIV; }
+"<" { return tLT; }
+">" { return tGT; }
 "&" { return tREF; }
 <<EOF>> { line = 1; return tEOF; }
 . { return tERROR; }
