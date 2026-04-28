@@ -13,5 +13,5 @@ speed:
 	gcc -O3 -Wall -Wno-unused-function -o interpreter.o asm_table.c interpreter.c
 
 clean:
-	rm *.yy.c *.tab.c *.tab.h *.o
+	rm -f *.yy.c *.tab.c *.tab.h *.o *.bytecode examples/*.bytecode
 
