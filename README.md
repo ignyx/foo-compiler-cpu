@@ -7,6 +7,7 @@ make clean
 make
 ./main.out examples/test.foo
 ./interpreter.o examples/test.foo.bytecode
+xxd examples/test.foo.bytecode # For the curious
 
 # Build with -O3, typically for benchmarking the interpreter
 make speed
