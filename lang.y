@@ -97,7 +97,7 @@ MATH_INSRUCTION: tIDENTIFIER tEGAL expr tSEMICOLON
     { const struct st_entry* entry = st_find(&table, $1);
       if (entry == NULL) yyerror("symbol $2 unknown");
       else if (entry->type == ST_CONST) yyerror("can't modify $2 as it's a constant");
-      asm_append(&asmt, ASM_COP, entry->addr, $3, 0);
+      else asm_append(&asmt, ASM_COP, entry->addr, $3, 0);
       if (table.locals[$3].type == ST_IMMEDIATE) st_free_top(&table);
       };
 POINTER_AFFECT: tMUL Term tEGAL expr tSEMICOLON
@@ -130,15 +130,15 @@ Term :
     tREF tIDENTIFIER
     { // store the address as an immediate and return it
       const struct st_entry* entry = st_find(&table, $2);
-      if (entry == NULL) yyerror("symbol $2 unknown");
       const uint32_t addr = st_alloc_imm(&table);
-      asm_append(&asmt, ASM_AFC, addr, entry->addr, 0);
+      if (entry == NULL) yyerror("symbol $2 unknown");
+      else asm_append(&asmt, ASM_AFC, addr, entry->addr, 0);
       $$ = addr; }
   | tIDENTIFIER
     { // return address
       const struct st_entry* entry = st_find(&table, $1);
       if (entry == NULL) yyerror("symbol $2 unknown");
-      $$ = entry->addr; }
+      $$ = entry ? entry->addr : 999; }
   | tINTEGER
     { // Assign an immediate to the value
       const uint32_t addr = st_alloc_imm(&table);
