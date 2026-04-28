@@ -9,6 +9,7 @@ static void symbol_error(char *symbol, char *message);
 uint32_t print_arithm_instr(enum asm_op_code op, uint32_t left, uint32_t right);
 extern int get_line_count(); // from lex
 extern int yylex();
+extern void yylex_destroy();
 
 static struct st_table table;
 static struct asm_table asmt;
@@ -235,6 +236,7 @@ int compile(FILE* in, FILE* outlst, FILE* outcod, FILE* err) {
   asm_fprintf(outlst, &asmt);
   asm_write_bytecode(outcod, &asmt);
   asm_free_table(&asmt);
+  yylex_destroy();
   if (error_occured) fprintf(err, "Errors occured during compilation, output might not reflect expected behavior\n");
   return 0;
 }
