@@ -1,7 +1,7 @@
 main() {
   int a = 0;
 
-  while (a - 1e6) {
+  while (a < 1e6) {
     a = a + 1;
   }
   printf(a);
