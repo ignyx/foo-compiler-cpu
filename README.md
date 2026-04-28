@@ -7,6 +7,9 @@ make clean
 make
 ./main.out test.foo
 ./interpreter.o test.foo.bytecode
+
+# Test for memleaks during an execution
+valgrind --leak-check=full --errors-for-leak-kinds=all --error-exitcode=1 ./main.o test.foo
 ```
 
 Features:
