@@ -5,15 +5,15 @@ C-style language.
 ```bash
 make clean
 make
-./main.out test.foo
-./interpreter.o test.foo.bytecode
+./main.out examples/test.foo
+./interpreter.o examples/test.foo.bytecode
 
 # Build with -O3, typically for benchmarking the interpreter
 make speed
 
 # Test for memleaks during an execution
-valgrind --leak-check=full --errors-for-leak-kinds=all --error-exitcode=1 ./main.o test.foo
-valgrind --leak-check=full --errors-for-leak-kinds=all --error-exitcode=1 ./interpreter.o test.foo.bytecode
+valgrind --leak-check=full --errors-for-leak-kinds=all --error-exitcode=1 ./main.o examples/test.foo
+valgrind --leak-check=full --errors-for-leak-kinds=all --error-exitcode=1 ./interpreter.o examples/test.foo.bytecode
 ```
 
 Compiler Features:

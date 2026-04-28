@@ -19,11 +19,11 @@ jobs:
         run: make
       - name: Check for memory leaks in compiler
         run: |
-          valgrind --leak-check=full --errors-for-leak-kinds=all --error-exitcode=1 ./main.o test.foo
-          valgrind --leak-check=full --errors-for-leak-kinds=all --error-exitcode=1 ./main.o test_if_2.foo
-          valgrind --leak-check=full --errors-for-leak-kinds=all --error-exitcode=1 ./main.o test_pointers_2.foo
+          valgrind --leak-check=full --errors-for-leak-kinds=all --error-exitcode=1 ./main.o examples/test.foo
+          valgrind --leak-check=full --errors-for-leak-kinds=all --error-exitcode=1 ./main.o examples/test_if_2.foo
+          valgrind --leak-check=full --errors-for-leak-kinds=all --error-exitcode=1 ./main.o examples/test_pointers_2.foo
       - name: Check for memory leaks in interpreter
         run: |
-          valgrind --leak-check=full --errors-for-leak-kinds=all --error-exitcode=1 ./interpreter.o test.foo.bytecode
-          valgrind --leak-check=full --errors-for-leak-kinds=all --error-exitcode=1 ./interpreter.o test_if_2.foo.bytecode
-          valgrind --leak-check=full --errors-for-leak-kinds=all --error-exitcode=1 ./interpreter.o test_pointers_2.foo.bytecode
+          valgrind --leak-check=full --errors-for-leak-kinds=all --error-exitcode=1 ./interpreter.o examples/test.foo.bytecode
+          valgrind --leak-check=full --errors-for-leak-kinds=all --error-exitcode=1 ./interpreter.o examples/test_if_2.foo.bytecode
+          valgrind --leak-check=full --errors-for-leak-kinds=all --error-exitcode=1 ./interpreter.o examples/test_pointers_2.foo.bytecode
