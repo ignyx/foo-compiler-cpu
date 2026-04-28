@@ -6,6 +6,7 @@
 
 void yyerror(char *s);
 uint32_t print_arithm_instr(enum asm_op_code op, uint32_t left, uint32_t right);
+extern int get_line_count(); // from lex
 
 static struct st_table table;
 static struct asm_table asmt;
@@ -168,7 +169,13 @@ CONDITION: tPARENTHISIS_LEFT expr tPARENTHISIS_RIGHT
 
 %%
 
-void yyerror(char *s) { fprintf(stderr, "%s\n", s); }
+static FILE *yyerr;
+static int error_occured;
+void yyerror(char *s) {
+  error_occured = 1;
+  fprintf(yyerr, "error line %d: %s\n", get_line_count(), s);
+  // st_printf(&table);
+}
 
 // Allocates an address for the result and prints the ASM instruction.
 // Frees immediate operands and reuses them where possible.
@@ -197,14 +204,18 @@ uint32_t print_arithm_instr(enum asm_op_code op, uint32_t left, uint32_t right) 
 extern FILE *yyin;
 int compile(FILE* in, FILE* outlst, FILE* outcod, FILE* err) {
   yyin = in;
+  yyerr = err;
+  error_occured = 0;
   st_init_table(&table);
   asm_init_table(&asmt);
+
   yyparse();
-  st_printf(&table);
+
+  // st_printf(&table);
   st_free_table(&table);
   asm_fprintf(outlst, &asmt);
   asm_write_bytecode(outcod, &asmt);
   asm_free_table(&asmt);
+  if (error_occured) fprintf(err, "Errors occured during compilation, output might not reflect expected behavior\n");
   return 0;
 }
-

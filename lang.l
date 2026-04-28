@@ -6,12 +6,14 @@
 #include "math.h"
 %}
 
+  static int line = 1;
+  int get_line_count() { return line; }
 
 %%
 
 [\t]+ { /*return tTAB;*/ }
 [ ]+ { /*return tSPACE;*/ }
-[\n]+ { /*return tLF;*/ }
+\n { line++; }
 const { return tCONST; }
 int { return tINT; }
 main { return tMAIN; }
@@ -41,7 +43,7 @@ while { return tWHILE; }
 "*"	{ return tMUL; }
 "/"	{ return tDIV; }
 "&" { return tREF; }
-<<EOF>> { return tEOF; }
+<<EOF>> { line = 1; return tEOF; }
 . { return tERROR; }
 %%
 
