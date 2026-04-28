@@ -1,0 +1,18 @@
+main(){
+  int a,b = 0;
+  int a;
+  const ff = 3;
+  ff = 2;
+  sdgf = 2;
+
+  if (1) {
+    a = 42;
+    if (a - 42) {
+      nit c = 2;
+      b = c;
+    }
+  }
+  printf(a);
+  printf(undefined);
+  printf(b);
+}
