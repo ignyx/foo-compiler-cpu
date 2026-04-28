@@ -16,8 +16,8 @@ Features:
 - [X] Perf: reuse allocated immediates where possible, to reduce `COP` instructions
 - [X] Multi-var declarations: `const foo, bar = (-1e5 - 3) * 3;`
 - [X] Output human-readable ASM and bytecode
-- [ ] Practical error handling
-- [ ] Enhanced error handling
+- [X] Practical error handling (display line number)
+- [X] Basic error recovery
 - [X] if/while
 - [ ] Function calling
 - [X] Pointers (add `LOAD`/`STORE` instructions)

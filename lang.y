@@ -31,7 +31,7 @@ static struct asm_table asmt;
 - [X] If/While
 - [X] Refactor to use proper I/O streams
 - [X] Update main.c to take in params (there's a util for that)
-- [ ] Print error line (not prio)
+- [X] Print error line (not prio)
 */
 
 /* recognize `main () { ... }` */
@@ -39,8 +39,13 @@ START : tMAIN tPARENTHISIS_LEFT tPARENTHISIS_RIGHT BLOCK tEOF
   { return 0; };
 
 BLOCK: BLOCK_START BLOCK_DECLARE BLOCK_INSTRUCTIONS BLOCK_END
-    { $$ = $4; };
-BLOCK_DECLARE: DECLARE BLOCK_DECLARE | DECLARE_UNINIT BLOCK_DECLARE | /* empty */ ;
+    { $$ = $4; }
+  | error { yyerror("couldn't parse block, skipping..."); }
+BLOCK_DECLARE:
+    DECLARE BLOCK_DECLARE
+  | DECLARE_UNINIT BLOCK_DECLARE
+  | DECLARE_MODIFIER error tSEMICOLON BLOCK_DECLARE { yyerror("couldn't parse declaration, see above"); }
+  | /* empty */ ;
 BLOCK_START: tBRACKET_LEFT
     { st_increase_depth(&table); };
 BLOCK_END: tBRACKET_RIGHT
@@ -92,7 +97,10 @@ BLOCK_INSTRUCTIONS:
   | PRINTF BLOCK_INSTRUCTIONS
   | IF BLOCK_INSTRUCTIONS
   | WHILE BLOCK_INSTRUCTIONS
+  | ERROR_INSTRUCTION BLOCK_INSTRUCTIONS
   | /* empty */;
+ERROR_INSTRUCTION:
+  error tSEMICOLON { yyerror("couldn't parse instruction, see above"); }
 MATH_INSRUCTION: tIDENTIFIER tEGAL expr tSEMICOLON
     { const struct st_entry* entry = st_find(&table, $1);
       if (entry == NULL) yyerror("symbol $2 unknown");
