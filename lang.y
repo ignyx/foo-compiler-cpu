@@ -20,7 +20,7 @@ static struct asm_table asmt;
 %token <number> tINTEGER
 %token <var> tIDENTIFIER
 /* Used to tell appart constants and variables in symbol table */
-%type <number> DECLARE_MODIFIER Term DivMul expr IDENTIFIER_ACU BLOCK BLOCK_END CONDITION WHILE_START
+%type <number> DECLARE_MODIFIER Term DivMul expr arithmetic IDENTIFIER_ACU BLOCK BLOCK_END CONDITION WHILE_START
 %start START
 
 %%
@@ -119,9 +119,12 @@ POINTER_AFFECT: tMUL Term tASSIGN expr tSEMICOLON
       if (table.locals[$2].type == ST_IMMEDIATE) st_free_top(&table);
     }
 expr :
-    expr tADD DivMul
+    arithmetic
+    { $$ = $1; };
+arithmetic:
+    arithmetic tADD DivMul
     { $$ = print_arithm_instr(ASM_ADD, $1, $3); }
-  | expr tSOU DivMul
+  | arithmetic tSOU DivMul
     { $$ = print_arithm_instr(ASM_SOU, $1, $3); }
   | DivMul;
 DivMul :
