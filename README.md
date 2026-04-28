@@ -25,5 +25,6 @@ Features:
 - [X] if/while
 - [ ] Function calling
 - [X] Pointers (add `LOAD`/`STORE` instructions)
-- [X] Interpreter (for coded version, supports branching)
+- [X] Interpreter (for coded version, supports all compiler features)
 - [ ] Cross-assembler
+- [X] Checked for memleaks using `valgrind` at each push
