@@ -8,6 +8,7 @@ void yyerror(char *s);
 static void symbol_error(char *symbol, char *message);
 uint32_t print_arithm_instr(enum asm_op_code op, uint32_t left, uint32_t right);
 extern int get_line_count(); // from lex
+extern int yylex();
 
 static struct st_table table;
 static struct asm_table asmt;
