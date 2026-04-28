@@ -37,7 +37,7 @@ while { return tWHILE; }
 ")" { return tPARENTHISIS_RIGHT; }
 "," { return tCOMMA; }
 ";" { return tSEMICOLON; }
-"="	{ return tEGAL; }
+"="	{ return tASSIGN; }
 "-"	{ return tSOU; }
 "+"	{ return tADD; }
 "*"	{ return tMUL; }

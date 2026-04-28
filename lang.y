@@ -16,7 +16,7 @@ static struct asm_table asmt;
 %}
 
 %union { int number; char* var; }
-%token tEOF tCONST tINT tMAIN tIF tWHILE tBRACKET_LEFT tBRACKET_RIGHT tPARENTHISIS_LEFT tPARENTHISIS_RIGHT tCOMMA tSEMICOLON tEGAL tSOU tADD tMUL tDIV tREF tERROR tPRINTF
+%token tEOF tCONST tINT tMAIN tIF tWHILE tBRACKET_LEFT tBRACKET_RIGHT tPARENTHISIS_LEFT tPARENTHISIS_RIGHT tCOMMA tSEMICOLON tASSIGN tSOU tADD tMUL tDIV tREF tERROR tPRINTF
 %token <number> tINTEGER
 %token <var> tIDENTIFIER
 /* Used to tell appart constants and variables in symbol table */
@@ -80,7 +80,7 @@ DECLARE_UNINIT: DECLARE_MODIFIER tIDENTIFIER IDENTIFIER_ACU tSEMICOLON
       table.locals[top - i].type = type;
     }
   };
-DECLARE: DECLARE_MODIFIER tIDENTIFIER IDENTIFIER_ACU tEGAL expr tSEMICOLON
+DECLARE: DECLARE_MODIFIER tIDENTIFIER IDENTIFIER_ACU tASSIGN expr tSEMICOLON
   { // First symbol reuses the immediate value
     if (st_find(&table, $2) != NULL) symbol_error($2, "is already declared, can't redeclare");
     const enum st_entry_type type = $1 ? ST_VAR : ST_CONST;
@@ -104,7 +104,7 @@ BLOCK_INSTRUCTIONS:
   | /* empty */;
 ERROR_INSTRUCTION:
   error tSEMICOLON { yyerror("couldn't parse instruction, see above"); }
-MATH_INSRUCTION: tIDENTIFIER tEGAL expr tSEMICOLON
+MATH_INSRUCTION: tIDENTIFIER tASSIGN expr tSEMICOLON
     { const struct st_entry* entry = st_find(&table, $1);
       if (entry == NULL) symbol_error($1, "is an undeclared identifier");
       else if (entry->type == ST_CONST) symbol_error($1, "is a constant, can't modify it");
@@ -112,7 +112,7 @@ MATH_INSRUCTION: tIDENTIFIER tEGAL expr tSEMICOLON
       if (table.locals[$3].type == ST_IMMEDIATE) st_free_top(&table);
       free($1);
       };
-POINTER_AFFECT: tMUL Term tEGAL expr tSEMICOLON
+POINTER_AFFECT: tMUL Term tASSIGN expr tSEMICOLON
     { // store and free immediates
       asm_append(&asmt, ASM_STORE, $2, $4, 0);
       if (table.locals[$4].type == ST_IMMEDIATE) st_free_top(&table);
