@@ -15,7 +15,7 @@ void st_init_table(struct st_table *table) {
 
 void st_free_table(struct st_table *table) {
   free(table->locals);
-  // TODO free names
+  // names are freed when free from table
 }
 
 struct st_entry *st_get_top(struct st_table *table) {
@@ -104,6 +104,7 @@ void st_decrease_depth_free(struct st_table *table) {
     // finding an immediate means it wasn't freed when it was supposed to...
     // st_printf(table);
     assert(st_get_top(table)->type != ST_IMMEDIATE);
+    free(st_get_top(table)->name);
     table->locals_count--;
   }
 }
