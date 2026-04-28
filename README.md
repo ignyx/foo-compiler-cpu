@@ -8,6 +8,9 @@ make
 ./main.out test.foo
 ./interpreter.o test.foo.bytecode
 
+# Build with -O3, typically for benchmarking the interpreter
+make speed
+
 # Test for memleaks during an execution
 valgrind --leak-check=full --errors-for-leak-kinds=all --error-exitcode=1 ./main.o test.foo
 valgrind --leak-check=full --errors-for-leak-kinds=all --error-exitcode=1 ./interpreter.o test.foo.bytecode
