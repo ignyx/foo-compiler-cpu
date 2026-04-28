@@ -16,18 +16,17 @@ valgrind --leak-check=full --errors-for-leak-kinds=all --error-exitcode=1 ./main
 valgrind --leak-check=full --errors-for-leak-kinds=all --error-exitcode=1 ./interpreter.o test.foo.bytecode
 ```
 
-Features:
-- [X] Parser
-- [X] Syntax analyzer
-- [X] Symbol table
-- [X] Perf: reuse allocated immediates where possible, to reduce `COP` instructions
-- [X] Multi-var declarations: `const foo, bar = (-1e5 - 3) * 3;`
-- [X] Output human-readable ASM and bytecode
-- [X] Practical error handling (display line number)
-- [X] Basic error recovery
-- [X] if/while
+Compiler Features:
+
+- [x] Multi-var declarations: `const foo, bar = (-1e5 - 3) * 3;`
+- [x] if/while
+- [x] Comparison operators
+- [x] Pointers (added `LOAD`/`STORE` instructions)
 - [ ] Function calling
-- [X] Pointers (add `LOAD`/`STORE` instructions)
-- [X] Interpreter (for coded version, supports all compiler features)
+- [x] Perf: reuse allocated immediates where possible, to reduce `COP` instructions
+- [x] Output human-readable ASM and bytecode
+- [x] Practical error handling (display line number)
+- [x] Basic error recovery
+- [x] Bytecode interpreter (supports all compiler features)
 - [ ] Cross-assembler
-- [X] Checked for memleaks using `valgrind` at each push
+- [x] Checked for memleaks using `valgrind` at each push
