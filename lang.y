@@ -109,6 +109,7 @@ MATH_INSRUCTION: tIDENTIFIER tEGAL expr tSEMICOLON
       else if (entry->type == ST_CONST) symbol_error($1, "is a constant, can't modify it");
       else asm_append(&asmt, ASM_COP, entry->addr, $3, 0);
       if (table.locals[$3].type == ST_IMMEDIATE) st_free_top(&table);
+      free($1);
       };
 POINTER_AFFECT: tMUL Term tEGAL expr tSEMICOLON
     { // store and free immediates
@@ -143,11 +144,13 @@ Term :
       const uint32_t addr = st_alloc_imm(&table);
       if (entry == NULL) symbol_error($2, "is an undeclared identifier");
       else asm_append(&asmt, ASM_AFC, addr, entry->addr, 0);
+      free($2);
       $$ = addr; }
   | tIDENTIFIER
     { // return address
       const struct st_entry* entry = st_find(&table, $1);
       if (entry == NULL) symbol_error($1, "is an undeclared identifier");
+      free($1);
       $$ = entry ? entry->addr : 999; }
   | tINTEGER
     { // Assign an immediate to the value
@@ -160,7 +163,8 @@ Term :
 PRINTF: tPRINTF tPARENTHISIS_LEFT tIDENTIFIER tPARENTHISIS_RIGHT tSEMICOLON
     { const struct st_entry* entry = st_find(&table, $3);
       if (entry == NULL) symbol_error($3, "is an undeclared identifier");
-      else asm_append(&asmt, ASM_PRI, entry->addr, 0, 0); };
+      else asm_append(&asmt, ASM_PRI, entry->addr, 0, 0);
+      free($3); };
 IF: tIF CONDITION BLOCK
     { asm_set_jump_target(&asmt, $2, $3);
       // free condition immediate
