@@ -62,6 +62,18 @@ architecture Behavioral of instr_bank is
      x"01_01_00_00", -- ADD r1 r0 r0
      x"02_02_00_00", -- MUL r2 r0 r0
      x"03_03_00_00", -- SOU r3 r0 r0
+     x"00_00_00_00", -- NOP
+     x"00_00_00_00", -- NOP
+     x"08_10_00_00", -- STORE [0x10] r0
+     x"08_11_01_00", -- STORE [0x11] r1
+     x"08_12_02_00", -- STORE [0x12] r2
+     x"08_13_03_00", -- STORE [0x13] r3
+     x"00_00_00_00", -- NOP
+     x"00_00_00_00", -- NOP
+     x"07_0A_10_00", -- LOAD r10 [0x10]
+     x"07_0B_11_00", -- LOAD r11 [0x11]
+     x"07_0C_12_00", -- LOAD r12 [0x12]
+     x"07_0D_13_00", -- LOAD r13 [0x13]
      others => (others => '0'));
 begin
     process begin

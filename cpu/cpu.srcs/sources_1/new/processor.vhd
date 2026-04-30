@@ -90,7 +90,7 @@ architecture Behavioral of processor is
   
   signal A_EXMem, B_EXMem, OP_EXMem: std_logic_vector(7 downto 0);
 
-  signal data_bank_addr, data_bank_in: std_logic_vector(7 downto 0);
+  signal data_bank_addr: std_logic_vector(7 downto 0);
   signal data_bank_rw: std_logic;
   component data_bank is
     Port ( addr : in STD_LOGIC_VECTOR (7 downto 0);
@@ -134,15 +134,15 @@ begin
     alu_op_DIEX(1 downto 0) <= OP_DIEX(1 downto 0) when OP_DIEX(7 downto 2) = x"0" else (others => '0');
     alu_op_DIEX(2) <= '0';
     
-    data_bank_addr <= B_EXMem;
-    data_bank_rw <= '1' when OP_EXMem = INSTR_LOAD else '0';
+    data_bank_addr <= A_EXmem when OP_EXMem = INSTR_STORE else B_EXMem;
+    data_bank_rw <= '0' when OP_EXMem = INSTR_STORE else '1';
     cpu_data_bank: data_bank port map (
         addr => data_bank_addr,
-        data_in => data_bank_in,
+        data_in => B_EXMem,
         data_out => data_bank_out,
         rw => data_bank_rw,
         rst => reset,
-        clk => clk -- TODO might introduce a race condition
+        clk => clk -- TODO might introduce a race condition. Edit: It does. See sim
     );
 
     
@@ -156,7 +156,8 @@ begin
         -- Sequentially update signals, starting with last stage
         A_MemRE <= A_EXMem;
         -- TODO perf: These if blocks could be simplified to signals
-        if (data_bank_rw = '1') then
+        -- TODO perf: also we could only check the nth last bits of instr. might already be the case?
+        if (OP_MEMRE = INSTR_LOAD) then
             B_MemRE <= data_bank_out;
         else
             B_MemRE <= B_EXMem;
@@ -174,7 +175,7 @@ begin
         
         A_DIEX <= A_LIDI;
         C_DIEX <= register_q_b;
-        if (OP_LIDI = INSTR_AFC) then
+        if (OP_LIDI = INSTR_AFC or OP_LIDI = INSTR_LOAD) then
             B_DIEX <= B_LIDI;
         else
             B_DIEX <= register_q_a; -- TODO check if mistake, was q_b here
@@ -182,7 +183,9 @@ begin
         -- B_DIEX <= B_LIDI when OP_LIDI = x"06" else register_q_b;
         OP_DIEX <= OP_LIDI;
         
+        -- TODO ask why LOAD/STORE use an address from the code and not from a register ?? How does a loop work ?
         
+        -- TODO rename this var
         OP_LIDI <= tmp_data_out(31 downto 24);
         A_LIDI <= tmp_data_out(23 downto 16);
         B_LIDI <= tmp_data_out(15 downto 8);
@@ -192,12 +195,4 @@ begin
         
         end if;
     end process;
-    
-    -- TODO:
-    -- use components
-    -- use signal A_LIDI
-    -- use a process to sync components on clock
-    -- signal updates happen on clock
-    
-
 end Behavioral;
