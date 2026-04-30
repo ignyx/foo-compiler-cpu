@@ -77,6 +77,7 @@ architecture Behavioral of processor is
   
   signal A_DIEX, B_DIEX, C_DIEX, OP_DIEX: std_logic_vector(7 downto 0);
 
+  signal alu_op_DIEX: std_logic_vector(2 downto 0);
   component alu
     port(
       A, B: in std_logic_vector(7 downto 0);
@@ -85,6 +86,7 @@ architecture Behavioral of processor is
       C, O, Z, N: out std_logic
     );
   end component;
+  signal alu_out_DIEX: std_logic_vector(7 downto 0);
   
   signal A_EXMem, B_EXMem, OP_EXMem: std_logic_vector(7 downto 0);
 
@@ -119,7 +121,17 @@ begin
         q_b => register_q_b
     );
     
-    write_back_MemRE <= '1' when OP_MemRE = INSTR_AFC or OP_MemRE = INSTR_COP else '0';
+    cpu_alu: alu port map (
+        A => B_DIEX,
+        B => C_DIEX,
+        Ctrl_ALU => alu_op_DIEX,
+        S => alu_out_DIEX
+    );
+    -- only support NOP, ADD, MUL, SUB
+    alu_op_DIEX(1 downto 0) <= OP_DIEX(1 downto 0) when OP_DIEX(7 downto 2) = x"0" else (others => '0');
+    alu_op_DIEX(2) <= '0';
+    
+    write_back_MemRE <= '1' when OP_MemRE /= INSTR_STORE and OP_MemRE /= INSTR_NOP else '0';
     
     process begin
         wait until rising_edge(clk);
@@ -132,15 +144,20 @@ begin
         OP_MemRE <= OP_EXMem;
         
         A_EXMem <= A_DIEX;
-        B_EXMem <= B_DIEX;
+        -- use ALU output for opcodes 0x00 through 0x04, ie NOP, ADD, MUL, SOU
+        if (OP_DIEX(7 downto 2) = x"0") then
+            B_EXMem <= alu_out_DIEX;
+        else
+            B_EXMem <= B_DIEX;
+        end if;
         OP_EXMem <= OP_DIEX;
         
         A_DIEX <= A_LIDI;
-        
+        C_DIEX <= register_q_b;
         if (OP_LIDI = INSTR_AFC) then
             B_DIEX <= B_LIDI;
         else
-            B_DIEX <= register_q_b;
+            B_DIEX <= register_q_a; -- TODO check if mistake, was q_b here
         end if;
        -- B_DIEX <= B_LIDI when OP_LIDI = x"06" else register_q_b;
         OP_DIEX <= OP_LIDI;
