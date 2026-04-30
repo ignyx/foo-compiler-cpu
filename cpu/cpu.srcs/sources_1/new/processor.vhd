@@ -86,10 +86,12 @@ architecture Behavioral of processor is
       C, O, Z, N: out std_logic
     );
   end component;
-  signal alu_out_DIEX: std_logic_vector(7 downto 0);
+  signal alu_out: std_logic_vector(7 downto 0);
   
   signal A_EXMem, B_EXMem, OP_EXMem: std_logic_vector(7 downto 0);
 
+  signal data_bank_addr, data_bank_in: std_logic_vector(7 downto 0);
+  signal data_bank_rw: std_logic;
   component data_bank is
     Port ( addr : in STD_LOGIC_VECTOR (7 downto 0);
            data_in : in STD_LOGIC_VECTOR (7 downto 0);
@@ -98,6 +100,7 @@ architecture Behavioral of processor is
            clk : in STD_LOGIC;
            data_out : out STD_LOGIC_VECTOR (7 downto 0));
   end component;
+  signal data_bank_out: std_logic_vector(7 downto 0);
 
   signal A_MemRE, B_MemRE, OP_MemRE: std_logic_vector(7 downto 0);
   signal write_back_MemRE: std_logic;
@@ -125,11 +128,23 @@ begin
         A => B_DIEX,
         B => C_DIEX,
         Ctrl_ALU => alu_op_DIEX,
-        S => alu_out_DIEX
+        S => alu_out
     );
     -- only support NOP, ADD, MUL, SUB
     alu_op_DIEX(1 downto 0) <= OP_DIEX(1 downto 0) when OP_DIEX(7 downto 2) = x"0" else (others => '0');
     alu_op_DIEX(2) <= '0';
+    
+    data_bank_addr <= B_EXMem;
+    data_bank_rw <= '1' when OP_EXMem = INSTR_LOAD else '0';
+    cpu_data_bank: data_bank port map (
+        addr => data_bank_addr,
+        data_in => data_bank_in,
+        data_out => data_bank_out,
+        rw => data_bank_rw,
+        rst => reset,
+        clk => clk -- TODO might introduce a race condition
+    );
+
     
     write_back_MemRE <= '1' when OP_MemRE /= INSTR_STORE and OP_MemRE /= INSTR_NOP else '0';
     
@@ -140,13 +155,18 @@ begin
         else
         -- Sequentially update signals, starting with last stage
         A_MemRE <= A_EXMem;
-        B_MemRE <= B_EXMem;
+        -- TODO perf: These if blocks could be simplified to signals
+        if (data_bank_rw = '1') then
+            B_MemRE <= data_bank_out;
+        else
+            B_MemRE <= B_EXMem;
+        end if;
         OP_MemRE <= OP_EXMem;
         
         A_EXMem <= A_DIEX;
         -- use ALU output for opcodes 0x00 through 0x04, ie NOP, ADD, MUL, SOU
         if (OP_DIEX(7 downto 2) = x"0") then
-            B_EXMem <= alu_out_DIEX;
+            B_EXMem <= alu_out;
         else
             B_EXMem <= B_DIEX;
         end if;
@@ -159,7 +179,7 @@ begin
         else
             B_DIEX <= register_q_a; -- TODO check if mistake, was q_b here
         end if;
-       -- B_DIEX <= B_LIDI when OP_LIDI = x"06" else register_q_b;
+        -- B_DIEX <= B_LIDI when OP_LIDI = x"06" else register_q_b;
         OP_DIEX <= OP_LIDI;
         
         
