@@ -86,7 +86,6 @@ static void run(struct asm_table *table) {
       assert_params_in_bounds(instr, 3);
       memory[instr->arg0] = memory[instr->arg1] == memory[instr->arg2] ? 1 : 0;
       break;
-    // TODO INF SUP EQU
     case ASM_PRI:
       assert_params_in_bounds(instr, 1);
       printf("%d\n", memory[instr->arg0]);

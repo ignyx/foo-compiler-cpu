@@ -25,18 +25,6 @@ static struct asm_table asmt;
 
 %%
 
-/* TODO Steps:
-- [X] Write lexical parser
-- [X] Write symbol table in separate file (probably using a linked list; in report explain why not redimensional arr)
-- [X] Use symbol table in yacc file
-- [X] Print assembly instructions
-- [X] Rewrite so asm instr are added to tab, then output
-- [X] If/While
-- [X] Refactor to use proper I/O streams
-- [X] Update main.c to take in params (there's a util for that)
-- [X] Print error line (not prio)
-*/
-
 /* recognize `main () { ... }` */
 START : tMAIN tPARENTHISIS_LEFT tPARENTHISIS_RIGHT BLOCK tEOF
   { return 0; };
