@@ -59,7 +59,7 @@ architecture Behavioral of processor is
            data_out : out STD_LOGIC_VECTOR (31 downto 0));
   end component;
   
-  signal tmp_data_out : std_logic_vector (31 downto 0);
+  signal instr_bank_out : std_logic_vector (31 downto 0);
   signal A_LIDI, B_LIDI, C_LIDI, OP_LIDI: std_logic_vector(7 downto 0);
 
   component register_bank is
@@ -109,7 +109,7 @@ begin
     cpu_instr_bank: instr_bank port map (
         addr => ip,
         clk => clk,
-        data_out => tmp_data_out
+        data_out => instr_bank_out
     );
     
     cpu_register_bank: register_bank port map (
@@ -185,11 +185,10 @@ begin
         
         -- TODO ask why LOAD/STORE use an address from the code and not from a register ?? How does a loop work ?
         
-        -- TODO rename this var
-        OP_LIDI <= tmp_data_out(31 downto 24);
-        A_LIDI <= tmp_data_out(23 downto 16);
-        B_LIDI <= tmp_data_out(15 downto 8);
-        C_LIDI <= tmp_data_out(7 downto 0);
+        OP_LIDI <= instr_bank_out(31 downto 24);
+        A_LIDI <= instr_bank_out(23 downto 16);
+        B_LIDI <= instr_bank_out(15 downto 8);
+        C_LIDI <= instr_bank_out(7 downto 0);
         
         ip <= ip + 1;
         
