@@ -49,7 +49,8 @@ architecture Behavioral of data_bank is
     signal memory: memory_t;
 begin
     process begin
-        wait until rising_edge(clk);
+    -- TODO explain in report why we use falling edge (sync issues
+        wait until falling_edge(clk);
         if rst = '0' then
             memory <= (others => x"00");
         elsif rw = '1' then

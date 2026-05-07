@@ -10,15 +10,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="205.997 ns"></ZoomStartTime>
-      <ZoomEndTime time="410.016 ns"></ZoomEndTime>
+      <ZoomStartTime time="249.100 ns"></ZoomStartTime>
+      <ZoomEndTime time="374.501 ns"></ZoomEndTime>
       <Cursor1Time time="270.000 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="276"></NameColumnWidth>
-      <ValueColumnWidth column_width="112"></ValueColumnWidth>
+      <ValueColumnWidth column_width="104"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="16" />
+   <WVObjectSize size="24" />
    <wvobject type="logic" fp_name="/test_processor/reset_test">
       <obj_property name="ElementShortName">reset_test</obj_property>
       <obj_property name="ObjectShortName">reset_test</obj_property>
@@ -52,6 +52,10 @@
       <obj_property name="ElementShortName">data_bank_addr[7:0]</obj_property>
       <obj_property name="ObjectShortName">data_bank_addr[7:0]</obj_property>
    </wvobject>
+   <wvobject type="array" fp_name="/test_processor/processor_uut/data_bank_out">
+      <obj_property name="ElementShortName">data_bank_out[7:0]</obj_property>
+      <obj_property name="ObjectShortName">data_bank_out[7:0]</obj_property>
+   </wvobject>
    <wvobject type="logic" fp_name="/test_processor/processor_uut/data_bank_rw">
       <obj_property name="ElementShortName">data_bank_rw</obj_property>
       <obj_property name="ObjectShortName">data_bank_rw</obj_property>
@@ -72,13 +76,41 @@
       <obj_property name="ElementShortName">write_back_MemRE</obj_property>
       <obj_property name="ObjectShortName">write_back_MemRE</obj_property>
    </wvobject>
+   <wvobject type="logic" fp_name="/test_processor/processor_uut/cpu_data_bank/rst">
+      <obj_property name="ElementShortName">rst</obj_property>
+      <obj_property name="ObjectShortName">rst</obj_property>
+   </wvobject>
    <wvobject type="logic" fp_name="/test_processor/processor_uut/cpu_data_bank/clk">
       <obj_property name="ElementShortName">clk</obj_property>
       <obj_property name="ObjectShortName">clk</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/test_processor/processor_uut/cpu_data_bank/memory">
-      <obj_property name="ElementShortName">memory[255:0][7:0]</obj_property>
-      <obj_property name="ObjectShortName">memory[255:0][7:0]</obj_property>
+   <wvobject type="logic" fp_name="/test_processor/processor_uut/cpu_data_bank/rw">
+      <obj_property name="ElementShortName">rw</obj_property>
+      <obj_property name="ObjectShortName">rw</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/test_processor/processor_uut/cpu_data_bank/addr">
+      <obj_property name="ElementShortName">addr[7:0]</obj_property>
+      <obj_property name="ObjectShortName">addr[7:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/test_processor/processor_uut/cpu_data_bank/data_in">
+      <obj_property name="ElementShortName">data_in[7:0]</obj_property>
+      <obj_property name="ObjectShortName">data_in[7:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/test_processor/processor_uut/cpu_data_bank/memory[19]">
+      <obj_property name="ElementShortName">[19][7:0]</obj_property>
+      <obj_property name="ObjectShortName">[19][7:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/test_processor/processor_uut/cpu_data_bank/memory[18]">
+      <obj_property name="ElementShortName">[18][7:0]</obj_property>
+      <obj_property name="ObjectShortName">[18][7:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/test_processor/processor_uut/cpu_data_bank/memory[17]">
+      <obj_property name="ElementShortName">[17][7:0]</obj_property>
+      <obj_property name="ObjectShortName">[17][7:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/test_processor/processor_uut/cpu_data_bank/memory[16]">
+      <obj_property name="ElementShortName">[16][7:0]</obj_property>
+      <obj_property name="ObjectShortName">[16][7:0]</obj_property>
    </wvobject>
    <wvobject type="array" fp_name="/test_processor/processor_uut/cpu_data_bank/data_out">
       <obj_property name="ElementShortName">data_out[7:0]</obj_property>

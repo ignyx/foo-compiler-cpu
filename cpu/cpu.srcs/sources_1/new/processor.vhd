@@ -142,10 +142,10 @@ begin
         data_out => data_bank_out,
         rw => data_bank_rw,
         rst => reset,
-        clk => clk -- TODO might introduce a race condition. Edit: It does. See sim
+        clk => clk
     );
 
-    
+
     write_back_MemRE <= '1' when OP_MemRE /= INSTR_STORE and OP_MemRE /= INSTR_NOP else '0';
     
     process begin
@@ -157,7 +157,7 @@ begin
         A_MemRE <= A_EXMem;
         -- TODO perf: These if blocks could be simplified to signals
         -- TODO perf: also we could only check the nth last bits of instr. might already be the case?
-        if (OP_MEMRE = INSTR_LOAD) then
+        if (OP_EXMem = INSTR_LOAD) then
             B_MemRE <= data_bank_out;
         else
             B_MemRE <= B_EXMem;
@@ -184,6 +184,7 @@ begin
         OP_DIEX <= OP_LIDI;
         
         -- TODO ask why LOAD/STORE use an address from the code and not from a register ?? How does a loop work ?
+        -- OK to use register
         
         OP_LIDI <= instr_bank_out(31 downto 24);
         A_LIDI <= instr_bank_out(23 downto 16);
