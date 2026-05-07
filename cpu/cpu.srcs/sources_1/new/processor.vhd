@@ -73,7 +73,7 @@ architecture Behavioral of processor is
            q_a : out STD_LOGIC_VECTOR (7 downto 0);
            q_b : out STD_LOGIC_VECTOR (7 downto 0));
   end component;
-  signal register_q_a, register_q_b : std_logic_vector (7 downto 0);
+  signal register_q_a, register_q_b, DI_out : std_logic_vector (7 downto 0);
   
   signal A_DIEX, B_DIEX, C_DIEX, OP_DIEX: std_logic_vector(7 downto 0);
 
@@ -86,7 +86,7 @@ architecture Behavioral of processor is
       C, O, Z, N: out std_logic
     );
   end component;
-  signal alu_out: std_logic_vector(7 downto 0);
+  signal alu_out, EX_out: std_logic_vector(7 downto 0);
   
   signal A_EXMem, B_EXMem, OP_EXMem: std_logic_vector(7 downto 0);
 
@@ -100,7 +100,7 @@ architecture Behavioral of processor is
            clk : in STD_LOGIC;
            data_out : out STD_LOGIC_VECTOR (7 downto 0));
   end component;
-  signal data_bank_out: std_logic_vector(7 downto 0);
+  signal data_bank_out, Mem_out: std_logic_vector(7 downto 0);
 
   signal A_MemRE, B_MemRE, OP_MemRE: std_logic_vector(7 downto 0);
   signal write_back_MemRE: std_logic;
@@ -123,6 +123,7 @@ begin
         q_a => register_q_a,
         q_b => register_q_b
     );
+    DI_out <= B_LIDI when OP_LIDI = INSTR_AFC or OP_LIDI = INSTR_LOAD else register_q_a;
     
     cpu_alu: alu port map (
         A => B_DIEX,
@@ -133,6 +134,8 @@ begin
     -- only support NOP, ADD, MUL, SUB
     alu_op_DIEX(1 downto 0) <= OP_DIEX(1 downto 0) when OP_DIEX(7 downto 2) = x"0" else (others => '0');
     alu_op_DIEX(2) <= '0';
+    -- use ALU output for opcodes 0x00 through 0x04, ie NOP, ADD, MUL, SOU
+    EX_out <= alu_out when OP_DIEX(7 downto 2) = x"0" else B_DIEX;
     
     data_bank_addr <= A_EXmem when OP_EXMem = INSTR_STORE else B_EXMem;
     data_bank_rw <= '0' when OP_EXMem = INSTR_STORE else '1';
@@ -144,7 +147,7 @@ begin
         rst => reset,
         clk => clk
     );
-
+    Mem_out <= data_bank_out when OP_EXMem = INSTR_LOAD else B_EXMem;
 
     write_back_MemRE <= '1' when OP_MemRE /= INSTR_STORE and OP_MemRE /= INSTR_NOP else '0';
     
@@ -155,32 +158,17 @@ begin
         else
         -- Sequentially update signals, starting with last stage
         A_MemRE <= A_EXMem;
-        -- TODO perf: These if blocks could be simplified to signals
         -- TODO perf: also we could only check the nth last bits of instr. might already be the case?
-        if (OP_EXMem = INSTR_LOAD) then
-            B_MemRE <= data_bank_out;
-        else
-            B_MemRE <= B_EXMem;
-        end if;
+        B_MemRE <= Mem_out;
         OP_MemRE <= OP_EXMem;
         
         A_EXMem <= A_DIEX;
-        -- use ALU output for opcodes 0x00 through 0x04, ie NOP, ADD, MUL, SOU
-        if (OP_DIEX(7 downto 2) = x"0") then
-            B_EXMem <= alu_out;
-        else
-            B_EXMem <= B_DIEX;
-        end if;
+        B_EXMem <= EX_out;
         OP_EXMem <= OP_DIEX;
         
         A_DIEX <= A_LIDI;
+        B_DIEX <= DI_out;
         C_DIEX <= register_q_b;
-        if (OP_LIDI = INSTR_AFC or OP_LIDI = INSTR_LOAD) then
-            B_DIEX <= B_LIDI;
-        else
-            B_DIEX <= register_q_a; -- TODO check if mistake, was q_b here
-        end if;
-        -- B_DIEX <= B_LIDI when OP_LIDI = x"06" else register_q_b;
         OP_DIEX <= OP_LIDI;
         
         -- TODO ask why LOAD/STORE use an address from the code and not from a register ?? How does a loop work ?
