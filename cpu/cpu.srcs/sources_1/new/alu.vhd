@@ -52,10 +52,10 @@ begin
     elsif Ctrl_ALU="011" then S_ext <= A_ext - B_ext;
     elsif Ctrl_ALU="010" then S_ext <= A * B;
     -- these are unspecified
-    elsif Ctrl_ALU="100" then S_ext <= A & B;
-    elsif Ctrl_ALU="110" then S_ext <= A or B;
-    elsif Ctrl_ALU="101" then S_ext <= A xor B;
-    elsif Ctrl_ALU="111" then S_ext <= not A;
+    --elsif Ctrl_ALU="100" then S_ext <= A & B;
+    --elsif Ctrl_ALU="110" then S_ext <= A or B;
+    --elsif Ctrl_ALU="101" then S_ext <= A xor B;
+    --elsif Ctrl_ALU="111" then S_ext <= not A;
     end if;
   end process;
   -- downto is used on little-endian systems.

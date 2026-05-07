@@ -49,7 +49,7 @@ architecture Behavioral of processor is
   constant INSTR_LOAD: cpu_instr_t := x"7";
   constant INSTR_STORE: cpu_instr_t := x"8";
 
-
+  signal OP_LIDI, OP_DIEX, OP_EXMem, OP_MemRE : cpu_instr_t;
 
   signal ip : std_logic_vector(7 downto 0);
 
@@ -60,7 +60,7 @@ architecture Behavioral of processor is
   end component;
   
   signal instr_bank_out : std_logic_vector (31 downto 0);
-  signal A_LIDI, B_LIDI, C_LIDI, OP_LIDI: std_logic_vector(7 downto 0);
+  signal A_LIDI, B_LIDI, C_LIDI: std_logic_vector(7 downto 0);
 
   component register_bank is
     Port ( reg_a : in STD_LOGIC_VECTOR (3 downto 0);
@@ -75,7 +75,7 @@ architecture Behavioral of processor is
   end component;
   signal register_q_a, register_q_b, DI_out : std_logic_vector (7 downto 0);
   
-  signal A_DIEX, B_DIEX, C_DIEX, OP_DIEX: std_logic_vector(7 downto 0);
+  signal A_DIEX, B_DIEX, C_DIEX: std_logic_vector(7 downto 0);
 
   signal alu_op_DIEX: std_logic_vector(2 downto 0);
   component alu
@@ -88,7 +88,7 @@ architecture Behavioral of processor is
   end component;
   signal alu_out, EX_out: std_logic_vector(7 downto 0);
   
-  signal A_EXMem, B_EXMem, OP_EXMem: std_logic_vector(7 downto 0);
+  signal A_EXMem, B_EXMem: std_logic_vector(7 downto 0);
 
   signal data_bank_addr: std_logic_vector(7 downto 0);
   signal data_bank_rw: std_logic;
@@ -102,7 +102,7 @@ architecture Behavioral of processor is
   end component;
   signal data_bank_out, Mem_out: std_logic_vector(7 downto 0);
 
-  signal A_MemRE, B_MemRE, OP_MemRE: std_logic_vector(7 downto 0);
+  signal A_MemRE, B_MemRE: std_logic_vector(7 downto 0);
   signal write_back_MemRE: std_logic;
 
 begin
@@ -132,10 +132,10 @@ begin
         S => alu_out
     );
     -- only support NOP, ADD, MUL, SUB
-    alu_op_DIEX(1 downto 0) <= OP_DIEX(1 downto 0) when OP_DIEX(7 downto 2) = x"0" else (others => '0');
+    alu_op_DIEX(1 downto 0) <= OP_DIEX(1 downto 0) when OP_DIEX(3 downto 2) = x"0" else (others => '0');
     alu_op_DIEX(2) <= '0';
     -- use ALU output for opcodes 0x00 through 0x04, ie NOP, ADD, MUL, SOU
-    EX_out <= alu_out when OP_DIEX(7 downto 2) = x"0" else B_DIEX;
+    EX_out <= alu_out when OP_DIEX(3 downto 2) = x"0" else B_DIEX;
     
     data_bank_addr <= A_EXmem when OP_EXMem = INSTR_STORE else B_EXMem;
     data_bank_rw <= '0' when OP_EXMem = INSTR_STORE else '1';
@@ -158,29 +158,28 @@ begin
         else
         -- Sequentially update signals, starting with last stage
         A_MemRE <= A_EXMem;
-        -- TODO perf: also we could only check the nth last bits of instr. might already be the case?
         B_MemRE <= Mem_out;
         OP_MemRE <= OP_EXMem;
         
         A_EXMem <= A_DIEX;
         B_EXMem <= EX_out;
         OP_EXMem <= OP_DIEX;
-        
+
         A_DIEX <= A_LIDI;
         B_DIEX <= DI_out;
         C_DIEX <= register_q_b;
         OP_DIEX <= OP_LIDI;
-        
+
         -- TODO ask why LOAD/STORE use an address from the code and not from a register ?? How does a loop work ?
         -- OK to use register
-        
-        OP_LIDI <= instr_bank_out(31 downto 24);
+
+        OP_LIDI <= instr_bank_out(27 downto 24);
         A_LIDI <= instr_bank_out(23 downto 16);
         B_LIDI <= instr_bank_out(15 downto 8);
         C_LIDI <= instr_bank_out(7 downto 0);
-        
+
         ip <= ip + 1;
-        
+
         end if;
     end process;
 end Behavioral;
