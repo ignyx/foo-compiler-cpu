@@ -62,6 +62,7 @@ architecture Behavioral of processor is
   signal instr_bank_out : std_logic_vector (31 downto 0);
   signal A_LIDI, B_LIDI, C_LIDI: std_logic_vector(7 downto 0);
 
+  signal register_bank_reg_b: std_logic_vector(3 downto 0);
   component register_bank is
     Port ( reg_a : in STD_LOGIC_VECTOR (3 downto 0);
            reg_b : in STD_LOGIC_VECTOR (3 downto 0);
@@ -73,7 +74,7 @@ architecture Behavioral of processor is
            q_a : out STD_LOGIC_VECTOR (7 downto 0);
            q_b : out STD_LOGIC_VECTOR (7 downto 0));
   end component;
-  signal register_q_a, register_q_b, DI_out : std_logic_vector (7 downto 0);
+  signal register_q_a, register_q_b, DI_A_out, DI_B_out: std_logic_vector (7 downto 0);
   
   signal A_DIEX, B_DIEX, C_DIEX: std_logic_vector(7 downto 0);
 
@@ -112,9 +113,10 @@ begin
         data_out => instr_bank_out
     );
     
+    register_bank_reg_b <= A_LIDI(3 downto 0) when OP_LIDI = INSTR_STORE else C_LIDI(3 downto 0);
     cpu_register_bank: register_bank port map (
         reg_a => B_LIDI(3 downto 0),
-        reg_b => C_LIDI(3 downto 0),
+        reg_b => register_bank_reg_b,
         reg_w => A_MemRE(3 downto 0),
         w => write_back_MemRE,
         data => B_MemRE,
@@ -123,7 +125,8 @@ begin
         q_a => register_q_a,
         q_b => register_q_b
     );
-    DI_out <= B_LIDI when OP_LIDI = INSTR_AFC or OP_LIDI = INSTR_LOAD else register_q_a;
+    DI_A_out <= register_q_b when OP_LIDI = INSTR_STORE else A_LIDI;
+    DI_B_out <= B_LIDI when OP_LIDI = INSTR_AFC else register_q_a;
     
     cpu_alu: alu port map (
         A => B_DIEX,
@@ -165,13 +168,14 @@ begin
         B_EXMem <= EX_out;
         OP_EXMem <= OP_DIEX;
 
-        A_DIEX <= A_LIDI;
-        B_DIEX <= DI_out;
+        A_DIEX <= DI_A_out;
+        B_DIEX <= DI_B_out;
         C_DIEX <= register_q_b;
         OP_DIEX <= OP_LIDI;
 
         -- TODO ask why LOAD/STORE use an address from the code and not from a register ?? How does a loop work ?
-        -- OK to use register
+        -- OK to use register according to V Migliore
+        -- TODO explain in report
 
         OP_LIDI <= instr_bank_out(27 downto 24);
         A_LIDI <= instr_bank_out(23 downto 16);

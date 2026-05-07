@@ -53,6 +53,10 @@ architecture Behavioral of instr_bank is
      x"06_00_05_03",
      x"05_0A_01_00",
      x"06_00_08_00", -- AFC r0 0x08
+     x"06_04_10_00", -- AFC r4 0x10
+     x"06_05_11_00", -- AFC r5 0x11
+     x"06_06_12_00", -- AFC r6 0x12
+     x"06_07_13_00", -- AFC r7 0x13
      x"00_00_00_00", -- NOP
      x"00_00_00_00", -- NOP
      x"00_00_00_00", -- NOP
@@ -64,16 +68,16 @@ architecture Behavioral of instr_bank is
      x"03_03_00_00", -- SOU r3 r0 r0
      x"00_00_00_00", -- NOP
      x"00_00_00_00", -- NOP
-     x"08_10_00_00", -- STORE [0x10] r0
-     x"08_11_01_00", -- STORE [0x11] r1
-     x"08_12_02_00", -- STORE [0x12] r2
-     x"08_13_03_00", -- STORE [0x13] r3
+     x"08_04_00_00", -- STORE [r4] r0
+     x"08_05_01_00", -- STORE [r5] r1
+     x"08_06_02_00", -- STORE [r6] r2
+     x"08_07_03_00", -- STORE [r7] r3
      x"00_00_00_00", -- NOP
      x"00_00_00_00", -- NOP
-     x"07_0A_10_00", -- LOAD r10 [0x10]
-     x"07_0B_11_00", -- LOAD r11 [0x11]
-     x"07_0C_12_00", -- LOAD r12 [0x12]
-     x"07_0D_13_00", -- LOAD r13 [0x13]
+     x"07_0A_04_00", -- LOAD r10 [r4]
+     x"07_0B_05_00", -- LOAD r11 [r5]
+     x"07_0C_06_00", -- LOAD r12 [r6]
+     x"07_0D_07_00", -- LOAD r13 [r7]
      others => (others => '0'));
 begin
     process begin
