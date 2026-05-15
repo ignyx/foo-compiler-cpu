@@ -5,7 +5,7 @@ C-style language.
 ```bash
 make clean
 make
-./main.out examples/test.foo
+./compiler.o examples/test.foo
 ./interpreter.o examples/test.foo.bytecode
 xxd examples/test.foo.bytecode # For the curious
 
@@ -13,7 +13,7 @@ xxd examples/test.foo.bytecode # For the curious
 make speed
 
 # Test for memleaks during an execution
-valgrind --leak-check=full --errors-for-leak-kinds=all --error-exitcode=1 ./main.o examples/test.foo
+valgrind --leak-check=full --errors-for-leak-kinds=all --error-exitcode=1 ./compiler.o examples/test.foo
 valgrind --leak-check=full --errors-for-leak-kinds=all --error-exitcode=1 ./interpreter.o examples/test.foo.bytecode
 ```
 
