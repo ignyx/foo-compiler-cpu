@@ -82,6 +82,8 @@ static void run(struct asm_table *table) {
     instr = &table->instructions[i];
 
     switch (instr->op) {
+    case ASM_NOP:
+      asm_append(&cpu_table, CPU_ASM_NOP, 0, 0, 0);
     case ASM_ADD:
     case ASM_MUL:
     case ASM_SOU:
