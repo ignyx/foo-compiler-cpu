@@ -1,0 +1,8 @@
+main () {
+  const myexp = 1e2;
+  int toto, tofu=-3;
+  int foo, bar, baz;
+  toto = toto + -1;
+  bar = -1e1;
+  foo = toto;
+}
