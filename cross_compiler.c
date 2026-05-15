@@ -53,7 +53,13 @@ static const struct cpu_asm_op_triplet CPU_ASM_OPS[] = {
 void cpu_asm_fprintf(FILE *out, struct asm_table *table) {
   for (int i = 0; i < table->instructions_count; i++) {
     const struct asm_instr instr = table->instructions[i];
-    fprintf(out, "%s", CPU_ASM_OPS[instr.op].name);
+
+    // We use a mask for the LSB, because negative values have 0xFF on other
+    // bytes. We already performed size checks.
+    fprintf(out, "    x\"%02x_%02x_%02x_%02x\", -- %s", (char)instr.op,
+            (char)instr.arg0 & 0xFF, (char)instr.arg1 & 0xFF,
+            (char)instr.arg2 & 0xFF, CPU_ASM_OPS[instr.op].name);
+
     if (CPU_ASM_OPS[instr.op].params >= 1)
       fprintf(out, " %d", instr.arg0);
     if (CPU_ASM_OPS[instr.op].params >= 2)
@@ -179,7 +185,7 @@ int main(int argc, char **argv) {
 
   asm_fprintf(stderr, &table);
 
-  fprintf(stderr, "Running bytecode (%d instructions) from %s\n",
+  fprintf(stderr, "Cross-assembling bytecode (%d instructions) from %s\n",
           table.instructions_count, argv[1]);
   run(&table);
 
