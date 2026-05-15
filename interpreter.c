@@ -42,6 +42,8 @@ static void run(struct asm_table *table) {
     pc++;
 
     switch (instr->op) {
+    case ASM_NOP:
+      break;
     case ASM_ADD:
       assert_params_in_bounds(instr, 3);
       memory[instr->arg0] = memory[instr->arg1] + memory[instr->arg2];
