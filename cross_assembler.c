@@ -105,10 +105,10 @@ static void run(struct asm_table *table) {
     // ASM_DIV is unsupported
     case ASM_COP:
       assert_params_in_bounds(instr, 2);
-      asm_append(&cpu_table, CPU_ASM_AFC, 0, instr->arg0, 0);
       asm_append(&cpu_table, CPU_ASM_AFC, 1, instr->arg1, 0);
-      asm_append(&cpu_table, CPU_ASM_LOAD, 0, 0, 0);
-      asm_append(&cpu_table, CPU_ASM_STORE, 1, 0, 0);
+      asm_append(&cpu_table, CPU_ASM_AFC, 0, instr->arg0, 0);
+      asm_append(&cpu_table, CPU_ASM_LOAD, 1, 1, 0);
+      asm_append(&cpu_table, CPU_ASM_STORE, 0, 1, 0);
       break;
     case ASM_AFC:
       assert_params_in_bounds(instr, 1);
