@@ -27,3 +27,7 @@ jobs:
           valgrind --leak-check=full --errors-for-leak-kinds=all --error-exitcode=1 ./interpreter.o examples/test.foo.bytecode
           valgrind --leak-check=full --errors-for-leak-kinds=all --error-exitcode=1 ./interpreter.o examples/test_if_2.foo.bytecode
           valgrind --leak-check=full --errors-for-leak-kinds=all --error-exitcode=1 ./interpreter.o examples/test_pointers_2.foo.bytecode
+      - name: Check for memory leaks in cross-assembler
+        run: |
+          ./compiler.o examples/test_cross.foo
+          valgrind --leak-check=full --errors-for-leak-kinds=all --error-exitcode=1 ./cross_assembler.o examples/test_cross.foo.bytecode
