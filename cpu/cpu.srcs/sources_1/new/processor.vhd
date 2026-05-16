@@ -55,11 +55,18 @@ architecture Behavioral of processor is
 
   component instr_bank is
     Port ( addr : in STD_LOGIC_VECTOR (7 downto 0);
-           clk : in STD_LOGIC;
+           clk, freeze : in STD_LOGIC;
            data_out : out STD_LOGIC_VECTOR (31 downto 0));
-  end component;
-  
+  end component;  
   signal instr_bank_out : std_logic_vector (31 downto 0);
+
+  component cpu_data_hazard is
+    Port ( clk, reset : in STD_LOGIC;
+           OP_DI, A_DI, C_LI, B_LI : in STD_LOGIC_VECTOR (3 downto 0);
+           Freeze_LI_CLOCK : out STD_LOGIC);
+  end component;
+  signal data_hazard : std_logic;
+
   signal A_LIDI, B_LIDI, C_LIDI: std_logic_vector(7 downto 0);
 
   signal register_bank_reg_b: std_logic_vector(3 downto 0);
@@ -110,9 +117,19 @@ begin
     cpu_instr_bank: instr_bank port map (
         addr => ip,
         clk => clk,
+        freeze => data_hazard,
         data_out => instr_bank_out
     );
-    
+    cpu_data_hazard_unit: cpu_data_hazard port map (
+        clk => clk,
+        reset => reset,
+        OP_DI => instr_bank_out(27 downto 24),
+        A_DI => instr_bank_out(19 downto 16),
+        B_LI => instr_bank_out(11 downto 8),
+        C_LI => instr_bank_out(3 downto 0),
+        Freeze_LI_CLOCK => data_hazard
+    );
+
     register_bank_reg_b <= A_LIDI(3 downto 0) when OP_LIDI = INSTR_STORE else C_LIDI(3 downto 0);
     cpu_register_bank: register_bank port map (
         reg_a => B_LIDI(3 downto 0),
@@ -127,7 +144,7 @@ begin
     );
     DI_A_out <= register_q_b when OP_LIDI = INSTR_STORE else A_LIDI;
     DI_B_out <= B_LIDI when OP_LIDI = INSTR_AFC else register_q_a;
-    
+
     cpu_alu: alu port map (
         A => B_DIEX,
         B => C_DIEX,
@@ -177,12 +194,15 @@ begin
         -- OK to use register according to V Migliore
         -- TODO explain in report
 
-        OP_LIDI <= instr_bank_out(27 downto 24);
-        A_LIDI <= instr_bank_out(23 downto 16);
-        B_LIDI <= instr_bank_out(15 downto 8);
-        C_LIDI <= instr_bank_out(7 downto 0);
-
-        ip <= ip + 1;
+        if data_hazard = '1' then
+            OP_LIDI <= INSTR_NOP;
+        else
+            OP_LIDI <= instr_bank_out(27 downto 24);
+            A_LIDI <= instr_bank_out(23 downto 16);
+            B_LIDI <= instr_bank_out(15 downto 8);
+            C_LIDI <= instr_bank_out(7 downto 0);
+            ip <= ip + 1;
+        end if;
 
         end if;
     end process;

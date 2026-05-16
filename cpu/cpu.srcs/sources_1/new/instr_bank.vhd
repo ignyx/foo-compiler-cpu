@@ -33,7 +33,7 @@ use IEEE.NUMERIC_STD.ALL;
 
 entity instr_bank is
     Port ( addr : in STD_LOGIC_VECTOR (7 downto 0);
-           clk : in STD_LOGIC;
+           clk, freeze : in STD_LOGIC;
            data_out : out STD_LOGIC_VECTOR (31 downto 0));
 end instr_bank;
 
@@ -78,10 +78,16 @@ architecture Behavioral of instr_bank is
      x"07_0B_05_00", -- LOAD r11 [r5]
      x"07_0C_06_00", -- LOAD r12 [r6]
      x"07_0D_07_00", -- LOAD r13 [r7]
+     x"01_08_0B_0C", -- ADD r8 r11 r12
+     x"01_09_08_08", -- ADD r9 r8 r8
+--     x"01_06_04_05", -- ADD r6 r4 r5
      others => (others => '0'));
 begin
     process begin
+        -- NOTE: instr bank is synchronous because synchronous memory is easier to map on FPGA
         wait until rising_edge(clk);
-        data_out <= memory(to_integer(unsigned(addr)));
+        if freeze = '0' then
+            data_out <= memory(to_integer(unsigned(addr)));
+        end if;
     end process;
 end Behavioral;

@@ -10,15 +10,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="249.100 ns"></ZoomStartTime>
-      <ZoomEndTime time="374.501 ns"></ZoomEndTime>
-      <Cursor1Time time="270.000 ns"></Cursor1Time>
+      <ZoomStartTime time="265.100 ns"></ZoomStartTime>
+      <ZoomEndTime time="489.718 ns"></ZoomEndTime>
+      <Cursor1Time time="371.572 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="276"></NameColumnWidth>
-      <ValueColumnWidth column_width="104"></ValueColumnWidth>
+      <ValueColumnWidth column_width="96"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="24" />
+   <WVObjectSize size="33" />
    <wvobject type="logic" fp_name="/test_processor/reset_test">
       <obj_property name="ElementShortName">reset_test</obj_property>
       <obj_property name="ObjectShortName">reset_test</obj_property>
@@ -31,10 +31,48 @@
       <obj_property name="ElementShortName">Clock_period</obj_property>
       <obj_property name="ObjectShortName">Clock_period</obj_property>
    </wvobject>
+   <wvobject type="array" fp_name="/test_processor/processor_uut/ip">
+      <obj_property name="ElementShortName">ip[7:0]</obj_property>
+      <obj_property name="ObjectShortName">ip[7:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/test_processor/processor_uut/instr_bank_out">
+      <obj_property name="ElementShortName">instr_bank_out[31:0]</obj_property>
+      <obj_property name="ObjectShortName">instr_bank_out[31:0]</obj_property>
+   </wvobject>
    <wvobject type="array" fp_name="/test_processor/processor_uut/cpu_register_bank/memory">
       <obj_property name="ElementShortName">memory[15:0][7:0]</obj_property>
       <obj_property name="ObjectShortName">memory[15:0][7:0]</obj_property>
       <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/test_processor/processor_uut/cpu_data_hazard_unit/used_reg">
+      <obj_property name="ElementShortName">used_reg[0:2][3:0]</obj_property>
+      <obj_property name="ObjectShortName">used_reg[0:2][3:0]</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/test_processor/processor_uut/cpu_data_hazard_unit/used">
+      <obj_property name="ElementShortName">used[2:0]</obj_property>
+      <obj_property name="ObjectShortName">used[2:0]</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/test_processor/processor_uut/OP_LIDI">
+      <obj_property name="ElementShortName">OP_LIDI[3:0]</obj_property>
+      <obj_property name="ObjectShortName">OP_LIDI[3:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/test_processor/processor_uut/A_LIDI">
+      <obj_property name="ElementShortName">A_LIDI[7:0]</obj_property>
+      <obj_property name="ObjectShortName">A_LIDI[7:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/test_processor/processor_uut/B_LIDI">
+      <obj_property name="ElementShortName">B_LIDI[7:0]</obj_property>
+      <obj_property name="ObjectShortName">B_LIDI[7:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/test_processor/processor_uut/C_LIDI">
+      <obj_property name="ElementShortName">C_LIDI[7:0]</obj_property>
+      <obj_property name="ObjectShortName">C_LIDI[7:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/test_processor/processor_uut/data_hazard">
+      <obj_property name="ElementShortName">data_hazard</obj_property>
+      <obj_property name="ObjectShortName">data_hazard</obj_property>
    </wvobject>
    <wvobject type="array" fp_name="/test_processor/processor_uut/A_EXMem">
       <obj_property name="ElementShortName">A_EXMem[7:0]</obj_property>
@@ -45,8 +83,8 @@
       <obj_property name="ObjectShortName">B_EXMem[7:0]</obj_property>
    </wvobject>
    <wvobject type="array" fp_name="/test_processor/processor_uut/OP_EXMem">
-      <obj_property name="ElementShortName">OP_EXMem[7:0]</obj_property>
-      <obj_property name="ObjectShortName">OP_EXMem[7:0]</obj_property>
+      <obj_property name="ElementShortName">OP_EXMem[3:0]</obj_property>
+      <obj_property name="ObjectShortName">OP_EXMem[3:0]</obj_property>
    </wvobject>
    <wvobject type="array" fp_name="/test_processor/processor_uut/data_bank_addr">
       <obj_property name="ElementShortName">data_bank_addr[7:0]</obj_property>
@@ -69,8 +107,8 @@
       <obj_property name="ObjectShortName">B_MemRE[7:0]</obj_property>
    </wvobject>
    <wvobject type="array" fp_name="/test_processor/processor_uut/OP_MemRE">
-      <obj_property name="ElementShortName">OP_MemRE[7:0]</obj_property>
-      <obj_property name="ObjectShortName">OP_MemRE[7:0]</obj_property>
+      <obj_property name="ElementShortName">OP_MemRE[3:0]</obj_property>
+      <obj_property name="ObjectShortName">OP_MemRE[3:0]</obj_property>
    </wvobject>
    <wvobject type="logic" fp_name="/test_processor/processor_uut/write_back_MemRE">
       <obj_property name="ElementShortName">write_back_MemRE</obj_property>

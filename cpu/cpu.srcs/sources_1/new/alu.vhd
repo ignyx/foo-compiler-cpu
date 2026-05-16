@@ -48,6 +48,7 @@ begin
   B_ext <= x"00" & B;
   process(A_ext,B_ext,Ctrl_ALU)
   begin
+    -- post synthesis this should perform as well as with "when", following discussion with prof
     if Ctrl_ALU="001" then S_ext <= A_ext + B_ext;
     elsif Ctrl_ALU="011" then S_ext <= A_ext - B_ext;
     elsif Ctrl_ALU="010" then S_ext <= A * B;
