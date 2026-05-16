@@ -39,12 +39,13 @@ end cpu_data_hazard;
 
 architecture Behavioral of cpu_data_hazard is
     -- The destination register is always A.
-    -- We save the 2 previous destination registers and whether they were used (NOP).
-    -- Index 0 contains the current instruction.
-    type memory_t is array (0 to 2) of std_logic_vector(3 downto 0);
+    -- We save the 3 previous destination registers and whether they were used (NOP).
+    -- Index 0 contains the current instruction. So 4 total.
+    constant HIST_SIZE : integer := 4;
+    type memory_t is array (0 to HIST_SIZE - 1) of std_logic_vector(3 downto 0);
     signal used_reg : memory_t;
     -- Whether the register was used (not the case for NOP)
-    signal used : std_logic_vector (2 downto 0);
+    signal used : std_logic_vector (HIST_SIZE - 1 downto 0);
     signal B_hazard, C_hazard : std_logic;
     signal B_reused, C_reused : std_logic;
     
@@ -57,10 +58,12 @@ begin
             used_reg <= (others => (others => '0'));
             used <= (others => '0');
         else
-          used_reg(2) <= used_reg(1);
-          used_reg(1) <= used_reg(0);
+          -- rotate history
+          for i in HIST_SIZE - 1 downto 1 loop
+            used_reg(i) <= used_reg(i - 1);
+          end loop;
           used_reg(0) <= A_DI;
-          used(2 downto 1) <= used(1 downto 0);
+          used(HIST_SIZE - 1 downto 1) <= used(HIST_SIZE - 2 downto 0);
           if OP_DI = x"0" then
             used(0) <= '0';
           else
@@ -69,19 +72,21 @@ begin
         end if;
     end process;
     
+    -- Could be refactored to use HIST_SIZE
+    -- See https://stackoverflow.com/questions/23639586/implementing-an-or-gate-with-for-generate
     B_reused <= '1' when 
         (used(0) = '1' and B_LI = used_reg(0)) or 
         (used(1) = '1' and B_LI = used_reg(1)) or
-        (used(2) = '1' and B_LI = used_reg(2)) else '0';
+        (used(2) = '1' and B_LI = used_reg(2)) or
+        (used(3) = '1' and B_LI = used_reg(3)) else '0';
     C_reused <= '1' when 
         (used(0) = '1' and C_LI = used_reg(0)) or 
         (used(1) = '1' and C_LI = used_reg(1)) or
-        (used(2) = '1' and C_LI = used_reg(2)) else '0';
+        (used(2) = '1' and C_LI = used_reg(2)) or
+        (used(3) = '1' and C_LI = used_reg(3)) else '0';
     
     B_hazard <= '1' when B_reused = '1' and (OP_DI /= x"6" and OP_DI /= x"0") else '0'; -- AFC, NOP
     C_hazard <= '1' when C_reused = '1' and (OP_DI = x"1" or OP_DI = x"2" or OP_DI = x"3") else '0'; -- ADD, SUB, MUL
-    
-    -- TODO Ça marche pas ? see sim
     
     Freeze_LI_CLOCK <= B_hazard or C_hazard;
 end Behavioral;

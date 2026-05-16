@@ -10,15 +10,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="265.100 ns"></ZoomStartTime>
-      <ZoomEndTime time="489.718 ns"></ZoomEndTime>
-      <Cursor1Time time="371.572 ns"></Cursor1Time>
+      <ZoomStartTime time="360.700 ns"></ZoomStartTime>
+      <ZoomEndTime time="485.301 ns"></ZoomEndTime>
+      <Cursor1Time time="10,000.000 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="276"></NameColumnWidth>
-      <ValueColumnWidth column_width="96"></ValueColumnWidth>
+      <ValueColumnWidth column_width="92"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="33" />
+   <WVObjectSize size="42" />
    <wvobject type="logic" fp_name="/test_processor/reset_test">
       <obj_property name="ElementShortName">reset_test</obj_property>
       <obj_property name="ObjectShortName">reset_test</obj_property>
@@ -73,6 +73,14 @@
    <wvobject type="logic" fp_name="/test_processor/processor_uut/data_hazard">
       <obj_property name="ElementShortName">data_hazard</obj_property>
       <obj_property name="ObjectShortName">data_hazard</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/test_processor/processor_uut/register_q_a">
+      <obj_property name="ElementShortName">register_q_a[7:0]</obj_property>
+      <obj_property name="ObjectShortName">register_q_a[7:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/test_processor/processor_uut/register_q_b">
+      <obj_property name="ElementShortName">register_q_b[7:0]</obj_property>
+      <obj_property name="ObjectShortName">register_q_b[7:0]</obj_property>
    </wvobject>
    <wvobject type="array" fp_name="/test_processor/processor_uut/A_EXMem">
       <obj_property name="ElementShortName">A_EXMem[7:0]</obj_property>
@@ -153,5 +161,33 @@
    <wvobject type="array" fp_name="/test_processor/processor_uut/cpu_data_bank/data_out">
       <obj_property name="ElementShortName">data_out[7:0]</obj_property>
       <obj_property name="ObjectShortName">data_out[7:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/test_processor/processor_uut/OP_DIEX">
+      <obj_property name="ElementShortName">OP_DIEX[3:0]</obj_property>
+      <obj_property name="ObjectShortName">OP_DIEX[3:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/test_processor/processor_uut/alu_op_DIEX">
+      <obj_property name="ElementShortName">alu_op_DIEX[2:0]</obj_property>
+      <obj_property name="ObjectShortName">alu_op_DIEX[2:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/test_processor/processor_uut/A_DIEX">
+      <obj_property name="ElementShortName">A_DIEX[7:0]</obj_property>
+      <obj_property name="ObjectShortName">A_DIEX[7:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/test_processor/processor_uut/B_DIEX">
+      <obj_property name="ElementShortName">B_DIEX[7:0]</obj_property>
+      <obj_property name="ObjectShortName">B_DIEX[7:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/test_processor/processor_uut/C_DIEX">
+      <obj_property name="ElementShortName">C_DIEX[7:0]</obj_property>
+      <obj_property name="ObjectShortName">C_DIEX[7:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/test_processor/processor_uut/alu_out">
+      <obj_property name="ElementShortName">alu_out[7:0]</obj_property>
+      <obj_property name="ObjectShortName">alu_out[7:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/test_processor/processor_uut/EX_out">
+      <obj_property name="ElementShortName">EX_out[7:0]</obj_property>
+      <obj_property name="ObjectShortName">EX_out[7:0]</obj_property>
    </wvobject>
 </wave_config>
