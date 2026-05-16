@@ -48,6 +48,7 @@ architecture Behavioral of cpu_data_hazard is
     signal used : std_logic_vector (HIST_SIZE - 1 downto 0);
     signal B_hazard, C_hazard : std_logic;
     signal B_reused, C_reused : std_logic;
+    signal Freeze : std_logic;
     
     -- TODO similarly handle memory data hazards
 begin
@@ -56,7 +57,7 @@ begin
         wait until falling_edge(clk);
         if (reset = '0') then
             used_reg <= (others => (others => '0'));
-            used <= (others => '0');
+            used(HIST_SIZE - 1 downto 1) <= (others => '0');
         else
           -- rotate history
           for i in HIST_SIZE - 1 downto 1 loop
@@ -64,23 +65,23 @@ begin
           end loop;
           used_reg(0) <= A_DI;
           used(HIST_SIZE - 1 downto 1) <= used(HIST_SIZE - 2 downto 0);
-          if OP_DI = x"0" then
-            used(0) <= '0';
-          else
-            used(0) <= '1';
-          end if;
+      --    if OP_DI = x"0" or Freeze = '1' then
+      --      used(0) <= '0';
+      --    else
+      --      used(0) <= '1';
+      --    end if;
         end if;
     end process;
     
+    used(0) <= '0' when OP_DI = x"0" or Freeze = '1' or reset = '0' else '1';
+
     -- Could be refactored to use HIST_SIZE
     -- See https://stackoverflow.com/questions/23639586/implementing-an-or-gate-with-for-generate
-    B_reused <= '1' when 
-        (used(0) = '1' and B_LI = used_reg(0)) or 
+    B_reused <= '1' when
         (used(1) = '1' and B_LI = used_reg(1)) or
         (used(2) = '1' and B_LI = used_reg(2)) or
         (used(3) = '1' and B_LI = used_reg(3)) else '0';
-    C_reused <= '1' when 
-        (used(0) = '1' and C_LI = used_reg(0)) or 
+    C_reused <= '1' when
         (used(1) = '1' and C_LI = used_reg(1)) or
         (used(2) = '1' and C_LI = used_reg(2)) or
         (used(3) = '1' and C_LI = used_reg(3)) else '0';
@@ -88,5 +89,6 @@ begin
     B_hazard <= '1' when B_reused = '1' and (OP_DI /= x"6" and OP_DI /= x"0") else '0'; -- AFC, NOP
     C_hazard <= '1' when C_reused = '1' and (OP_DI = x"1" or OP_DI = x"2" or OP_DI = x"3") else '0'; -- ADD, SUB, MUL
     
-    Freeze_LI_CLOCK <= B_hazard or C_hazard;
+    Freeze <= B_hazard or C_hazard;
+    Freeze_LI_CLOCK <= Freeze;
 end Behavioral;
