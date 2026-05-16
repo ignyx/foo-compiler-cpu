@@ -44,7 +44,7 @@ architecture Behavioral of instr_bank is
     type memory_t is array (0 to CELL_COUNT - 1) of cell_t;
     
     signal memory: memory_t := (
-    -- output from cross-compiler goes here
+    -- output from cross-assembler goes here
      x"01_00_01_02",
      x"01_00_01_03",
      x"06_00_01_00",

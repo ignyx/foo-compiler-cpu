@@ -162,7 +162,7 @@ static void run(struct asm_table *table) {
   }
 
   if (i < table->instructions_count - 1)
-    fprintf(stderr, "error: Couldn't compile in under 256 instructions");
+    fprintf(stderr, "error: Couldn't cross-assemble in under 256 instructions");
 
   cpu_asm_fprintf(stdout, &cpu_table);
   asm_free_table(&cpu_table);
