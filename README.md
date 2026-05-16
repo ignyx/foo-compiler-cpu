@@ -9,6 +9,10 @@ make
 ./interpreter.o examples/test.foo.bytecode
 xxd examples/test.foo.bytecode # For the curious
 
+# Cross-assemble to CPU ISA in VHDL-compatible format
+./compiler.o examples/test_cross.foo
+./cross_assembler.o examples/test_cross.foo.bytecode
+
 # Build with -O3, typically for benchmarking the interpreter
 make speed
 
@@ -29,5 +33,61 @@ Compiler Features:
 - [x] Practical error handling (display line number)
 - [x] Basic error recovery
 - [x] Bytecode interpreter (supports all compiler features)
-- [ ] Cross-assembler
+- [x] Cross-assembler
 - [x] Checked for memleaks using `valgrind` at each push
+
+CPU Features:
+
+- [x] All specified assembly instructions
+- [x] Data hazards
+- [ ] LED output
+- [ ] FPGA demo
+- [ ] Jumps
+- [ ] Function calling instructions and registers
+
+## Cross-Assembler (`./cross_assembler.c`)
+
+The compiler outputs a memory-oriented assembly, while the CPU uses a register-oriented ISA.
+
+It reads the bytecode into an `asm_table` and prints cross-assembled CPU assembly to `stdout`.
+
+### Simple version
+
+I wrote a first straightforward implementation that `LOAD`/`STORE`s values for each instruction.
+It leads to useless `LOAD`/`STORE` and multi-cycle data-hazards. I ordered instructions to minimize
+data hazards and reduce average cycle count per instruction.
+
+This implementation defeats the purpose of having a register-oriented CPU.
+
+My CPU `LOAD`/`STORE` reads the address from a register, so I must `AFC` the address.
+A simpler optimization could be to reuse the `AFC`ed addresses between instructions.
+
+Doesn't support `JMP`/`JMPF` because the CPU doesn't.
+
+### Thougts about further optimization
+
+I thought about using a register->memory mapping with an LRU eviction policy
+but it isn't sufficient.
+
+Goals:
+
+- Reduce memory accesses by utilizing all registers
+- Reduce instruction count
+- Prevent data hazards
+- Remain compliant with expected output behavior
+
+Care must be taken with jump instructions because references must remain
+valid. Care must be taken with values handled with pointers: `LOAD` can read
+from a hard-to-predict address and `STORE` can write anywhere. This `LOAD`/`STORE`
+behavior requires us to commit all changes to memory.
+
+I designed but didn't implement the following idea. A first forward pass:
+
+- checks whether the code contains `LOAD` or `STORE` instructions.
+  If none are present, we don't need to commit all changes to memory.
+- stores up to which instruction a value is needed (either last used before overwritten or if before a jump)
+
+Second forward pass outputs instructions.
+It stores values in registers, and adds `STORE` memory commits to a queue.
+The queue is flushed when the following instruction is a `LOAD`, `STORE` or jump,
+when a register is about to be overwritten, or when we expect a data hazard.
