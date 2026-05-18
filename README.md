@@ -42,9 +42,11 @@ CPU Features:
 - [x] Data hazards
 - [x] PRI outputs to FPGA board LEDs (LSB is left-most)
 - [x] FPGA board has reset switch (right-most switch)
-- [ ] FPGA demo
+- [x] FPGA demo
 - [ ] Jumps
 - [ ] Function calling instructions and registers
+
+TODO add image
 
 ## Design process
 
@@ -92,6 +94,52 @@ Comments provide the _why_. Prefixes allow identifying which component it is abo
 
 Enums and constants are used to give meaning to numeric values (eg. `ASM_ADD`, `ST_TABLE_INIT_SIZE`).
 
+## Compiler
+
+Rule actions usually return the memory address of its result.
+
+### Parsing arithmetic and pointers
+
+I used the `DivMul` approach from the calculator example.
+It gracefully handles what would be conflicts.
+I read about using `%left` but `DivMul` is easier to read.
+Parsing the dereference operator (`*`) was as easy as adding a rule to `DivMul`.
+
+### Storing output instructions
+
+Branching requires us to update a parameter from a previous instruction.
+I wrote a dynamically-sized `asm_table` to store instructions so they can be edited prior to output.
+It is shared across the compiler, interpreter and cross-assembler.
+
+### Symbol table
+
+TODO
+
+TODO COP opti
+
+### Added instructions
+
+`NOP 0 0 0`: opcode `0x00` wasn't used, but can be useful. 
+
+`LOAD ri [rj]` (opcode `0x0D`): Used with pointers. Loads into `ri` the value at the address contained in `rj`. Using the address allows us to iterate over an array (for example) instead of only hardcoded values.
+
+`STORE [ri] rj` (opcode `0x0E`): Used with pointers. Stores the value in `rj` at the adress contained in `ri`. Same story.
+
+## Interpreter
+
+An interpreter handling jumps needs to arbitrarily jump to another section of the code.
+Therefore, a LEX/YACC implementation is not practical.
+
+Instead, I stored the assembly instructions as binary/bytecode.
+Each instruction is just 32 bytes (opcode + 3 operands, all `int`s)
+It's easy to write and read, while being fast.
+The `asm_table` can be exported to/imported from bytecode.
+
+The interpreter checks for illegal memory accesses.
+
+It runs until reaching the end of the instructions.
+
+
 ## Cross-Assembler (`./cross_assembler.c`)
 
 The compiler outputs a memory-oriented assembly, while the CPU uses a register-oriented ISA.
@@ -138,3 +186,7 @@ Second forward pass outputs instructions.
 It stores values in registers, and adds `STORE` memory commits to a queue.
 The queue is flushed when the following instruction is a `LOAD`, `STORE` or jump,
 when a register is about to be overwritten, or when we expect a data hazard.
+
+## 5-stage RISC processor
+
+### TODO added instructions
