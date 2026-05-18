@@ -46,8 +46,6 @@ CPU Features:
 - [ ] Jumps
 - [ ] Function calling instructions and registers
 
-TODO add image
-
 ## Design process
 
 ### Code modularity
@@ -125,6 +123,8 @@ TODO COP opti
 
 `STORE [ri] rj` (opcode `0x0E`): Used with pointers. Stores the value in `rj` at the adress contained in `ri`. Same story.
 
+Implementing functions would have added `CALL` and `RET`.
+
 ## Interpreter
 
 An interpreter handling jumps needs to arbitrarily jump to another section of the code.
@@ -189,4 +189,47 @@ when a register is about to be overwritten, or when we expect a data hazard.
 
 ## 5-stage RISC processor
 
-### TODO added instructions
+The main `processor.vhdl` file handles data paths and updates values between stages.
+It consists of combinatorial signals and one process whos job is to copy values between stages.
+
+### Data bank synchronization
+
+The memory data bank is synchronous. Using the same clock and waiting for `rising_edge`
+led to a race condition between the data bank process and the the processor process that updates the stage inputs.
+
+My data bank process syncs on `falling_edge` to mitigate this issue. This was approved by a teacher.
+
+### Data hazards
+
+The destination register is always A.
+We save the 3 previous destination registers and whether they were used (NOP).
+If the register is reused by B or C, the processor freezes the Instruction Pointer until the data hazard has passed.
+
+It also syncs on `falling_edge`.
+
+### Added/modified instructions
+
+The specified `LOAD`/`STORE` instructions read the address from the code rather than from a register.
+This is constraining, and doesn't allow iterating (for example over an array or a pointer).
+Instead, we modified the ISA to read the address from a register (like in the memory-oriented ISA).
+We obtain the following data path:
+
+![Data path after LOAD/STORE instruction change](./assets/chemin-w-load-store-regs.png)
+
+Furthermore, in order to display outputs on the FPGA dev board, we added the `PRI` (opcode `0x9`) print instruction.
+It takes one register as a parameter and updates the value shown on the LEDs.
+However, to simplify the data hazard handling, instead of using the first parameter, we use the second.
+Example: `PRI 1 2 3` displays the value in `r2`. `1` and `3` are discarded.
+
+### FPGA dev board demo
+
+The Basys 3 has a clock frequency of 50 MHz.
+This is way to fast for the human eye to appreciate.
+I divided the clock in `main.vhdl`.
+
+The reset switch (right-most switch) should be switched on/off for a proper reset.
+The LEDs should then be updated upon `PRI`.
+The Least Significant Bit is the left-most LED.
+
+TODO add image. Show LSB, MSB. Show reset switch.
+
