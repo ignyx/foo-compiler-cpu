@@ -16,7 +16,8 @@ enum cpu_asm_op_code {
   CPU_ASM_COP = 0x5,
   CPU_ASM_AFC = 0x6,
   CPU_ASM_LOAD = 0x7,
-  CPU_ASM_STORE = 0x8
+  CPU_ASM_STORE = 0x8,
+  CPU_ASM_PRI = 0x9, // source register is second arg (for data hazards)
 };
 
 static void assert_params_in_bounds(struct asm_instr *instr, int count) {
@@ -47,7 +48,7 @@ static const struct cpu_asm_op_triplet CPU_ASM_OPS[] = {
     {CPU_ASM_MUL, "MUL", 3},    {CPU_ASM_SOU, "SOU", 3},
     {CPU_ASM_DIV, "DIV", 3},    {CPU_ASM_COP, "COP", 2},
     {CPU_ASM_AFC, "AFC", 2},    {CPU_ASM_LOAD, "LOAD", 2},
-    {CPU_ASM_STORE, "STORE", 2}};
+    {CPU_ASM_STORE, "STORE", 2}, {CPU_ASM_PRI, "PRI", 2}};
 
 // Prints to out in a VHDL-compatible listing
 void cpu_asm_fprintf(FILE *out, struct asm_table *table) {
@@ -153,6 +154,15 @@ static void run(struct asm_table *table) {
       // On charge l'adresse dans r1
       asm_append(&cpu_table, CPU_ASM_LOAD, 1, 1, 0);
       asm_append(&cpu_table, CPU_ASM_STORE, 1, 0, 0);
+      break;
+    case ASM_PRI:
+      assert_params_in_bounds(instr, 2);
+      // On charge l'adresse dans r1
+      asm_append(&cpu_table, CPU_ASM_AFC, 1, instr->arg0, 0);
+      // On charge la valeur dans r1
+      asm_append(&cpu_table, CPU_ASM_LOAD, 1, 1, 0);
+      // Afficher la valeur dans r1
+      asm_append(&cpu_table, CPU_ASM_PRI, 0, 1, 0);
       break;
     default:
       fprintf(stderr, "unsupported op 0x%x at pc=0x%x\n", instr->op, i);
