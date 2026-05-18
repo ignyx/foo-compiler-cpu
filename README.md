@@ -119,7 +119,7 @@ Their depth is stored, so they can be dropped once out of scope.
 The table has a legible API to enhance readability in the syntax analyzer.
 
 The compilation *traces* suggest that `const a = 1;` be compiled to `AFC 0 1; COP 0 0`.
-My approach reuses immediates to reduce instruction count and memory usage.
+My approach reuses immediates to reduce instruction count and memory usage: `AFC 0 1`.
 
 ### Error handling
 
@@ -155,7 +155,7 @@ An interpreter handling jumps needs to arbitrarily jump to another section of th
 Therefore, a LEX/YACC implementation is not practical.
 
 Instead, I stored the assembly instructions as binary/bytecode.
-Each instruction is just 32 bytes (opcode + 3 operands, all `int`s)
+Each instruction is just 16 bytes (opcode + 3 operands, all `int`s)
 It's easy to write and read, while being fast.
 The `asm_table` can be exported to/imported from bytecode.
 
@@ -213,7 +213,7 @@ when a register is about to be overwritten, or when we expect a data hazard.
 
 ## 5-stage RISC processor
 
-The main `processor.vhdl` file handles data paths and updates values between stages.
+The main `processor.vhd` file handles data paths and updates values between stages.
 It consists of combinatorial signals and one process whos job is to copy values between stages.
 
 ### Data bank synchronization
@@ -226,7 +226,7 @@ My data bank process syncs on `falling_edge` to mitigate this issue. This was ap
 ### Data hazards
 
 The destination register is always A.
-We save the 3 previous destination registers and whether they were used (NOP).
+We save the 3 previous destination registers and whether they were used (`NOP` doesn't use A).
 If the register is reused by B or C, the processor freezes the Instruction Pointer until the data hazard has passed.
 
 It also syncs on `falling_edge`.
@@ -249,7 +249,7 @@ Example: `PRI 1 2 3` displays the value in `r2`. `1` and `3` are discarded.
 
 The Basys 3 has a clock frequency of 50 MHz.
 This is way to fast for the human eye to appreciate.
-I divided the clock in `main.vhdl`.
+I divided the clock in `main.vhd`.
 
 The reset switch (right-most switch) should be switched on/off for a proper reset.
 The LEDs should then be updated upon `PRI`.
