@@ -1,5 +1,7 @@
 # Foolang
 
+NOTE: This document is best read from the [Github interface](https://github.com/ignyx/foo-compiler-cpu#foolang).
+
 C-style language.
 
 ```bash
@@ -111,7 +113,7 @@ It is shared across the compiler, interpreter and cross-assembler.
 
 ### Symbol table
 
-TODO
+TODO scope drop ?
 
 TODO COP opti
 
