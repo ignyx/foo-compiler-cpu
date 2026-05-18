@@ -150,9 +150,12 @@ static void run(struct asm_table *table) {
       assert_params_in_bounds(instr, 2);
       // On charge l'adresse de l'adresse dans r1
       asm_append(&cpu_table, CPU_ASM_AFC, 1, instr->arg0, 0);
+      // On charge l'adresse de la valeur dans r0
       asm_append(&cpu_table, CPU_ASM_AFC, 0, instr->arg1, 0);
       // On charge l'adresse dans r1
       asm_append(&cpu_table, CPU_ASM_LOAD, 1, 1, 0);
+      // On charge la valeur dans r0
+      asm_append(&cpu_table, CPU_ASM_LOAD, 0, 0, 0);
       asm_append(&cpu_table, CPU_ASM_STORE, 1, 0, 0);
       break;
     case ASM_PRI:
