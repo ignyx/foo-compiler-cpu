@@ -128,7 +128,7 @@ DivMul :
     { $$ = print_arithm_instr(ASM_MUL, $1, $3); }
   | DivMul tDIV Term
     { $$ = print_arithm_instr(ASM_DIV, $1, $3); }
-  | tMUL Term
+  | tMUL Term // Dereference
     { // Load the value into an immediate.
       // Re-use immediate from the address, or allocate a new one.
       // Example: `*(a+2)` (immediate from the sum) vs `*a` (no immediate because `a` is a variable).
@@ -138,7 +138,7 @@ DivMul :
   | Term
     { $$ = $1; };
 Term :
-    tREF tIDENTIFIER
+    tREF tIDENTIFIER // Reference
     { // store the address as an immediate and return it
       const struct st_entry* entry = st_find(&table, $2);
       const uint32_t addr = st_alloc_imm(&table);

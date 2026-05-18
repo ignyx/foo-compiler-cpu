@@ -113,9 +113,31 @@ It is shared across the compiler, interpreter and cross-assembler.
 
 ### Symbol table
 
-TODO scope drop ?
+A dynamically-sized `symbol_table` stores the adresses of constants, variables and immediates.
+Their depth is stored, so they can be dropped once out of scope.
 
-TODO COP opti
+The table has a legible API to enhance readability in the syntax analyzer.
+
+The compilation *traces* suggest that `const a = 1;` be compiled to `AFC 0 1; COP 0 0`.
+My approach reuses immediates to reduce instruction count and memory usage.
+
+### Error handling
+
+Prints line upon error. Attempts to recover from an erroneous line using YACC error mechanisms.
+
+```bash
+$ ./compiler.o examples/test_error_handling.foo
+error line 3: a is already declared, can't redeclare
+error line 5: ff is a constant, can't modify it
+error line 6: sdgf is an undeclared identifier
+error line 11: syntax error
+error line 11: couldn't parse instruction, see above
+error line 12: c is an undeclared identifier
+error line 16: undefined is an undeclared identifier
+AFC 1 0
+<more assembly>
+Errors occured during compilation, output might not reflect expected behavior
+```
 
 ### Added instructions
 
@@ -142,7 +164,7 @@ The interpreter checks for illegal memory accesses.
 It runs until reaching the end of the instructions.
 
 
-## Cross-Assembler (`./cross_assembler.c`)
+## Cross-Assembler
 
 The compiler outputs a memory-oriented assembly, while the CPU uses a register-oriented ISA.
 
