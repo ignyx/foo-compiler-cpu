@@ -3,8 +3,12 @@ main () {
   int toto, tofu=-3;
   int foo, bar, baz;
 
+  printf(myexp);
   *(&foo) = *(&tofu);
+  printf(foo);
+  printf(toto);
   toto = toto + -1;
+  printf(toto);
   bar = -1e1;
   foo = toto;
 }
