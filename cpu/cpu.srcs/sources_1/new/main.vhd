@@ -46,10 +46,12 @@ architecture Behavioral of main is
     
   -- clock is at 50 MHz
   -- 2**25 = 33,554,432
-  -- Passing the MSB to CK results in 1-2 Hz
-   signal divider_count: std_logic_vector(25 downto 0) := (others => '0');
+  -- 2**21 = 2,097,152
+  -- Passing the MSB (for 25) to CK results in 1-2 Hz
+  -- Passing the MSB (for 21) to CK results in about 24 Hz
+   signal divider_count: std_logic_vector(20 downto 0) := (others => '0');
 begin
-  cpu_uut: processor port map (clk => divider_count(25), reset => rst, dout => dout);
+  cpu_uut: processor port map (clk => divider_count(20), reset => rst, dout => dout);
   process
   begin
     wait until rising_edge(CLK);

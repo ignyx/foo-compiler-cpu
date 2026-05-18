@@ -10,15 +10,19 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="164.080 ns"></ZoomStartTime>
-      <ZoomEndTime time="291.081 ns"></ZoomEndTime>
-      <Cursor1Time time="215.080 ns"></Cursor1Time>
+      <ZoomStartTime time="0.000 ns"></ZoomStartTime>
+      <ZoomEndTime time="327.501 ns"></ZoomEndTime>
+      <Cursor1Time time="216.000 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="276"></NameColumnWidth>
-      <ValueColumnWidth column_width="80"></ValueColumnWidth>
+      <ValueColumnWidth column_width="76"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="52" />
+   <WVObjectSize size="53" />
+   <wvobject type="array" fp_name="/test_processor/processor_uut/Dout">
+      <obj_property name="ElementShortName">Dout[7:0]</obj_property>
+      <obj_property name="ObjectShortName">Dout[7:0]</obj_property>
+   </wvobject>
    <wvobject type="logic" fp_name="/test_processor/reset_test">
       <obj_property name="ElementShortName">reset_test</obj_property>
       <obj_property name="ObjectShortName">reset_test</obj_property>
