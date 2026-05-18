@@ -255,5 +255,5 @@ The reset switch (right-most switch) should be switched on/off for a proper rese
 The LEDs should then be updated upon `PRI`.
 The Least Significant Bit is the left-most LED.
 
-TODO add image. Show LSB, MSB. Show reset switch.
+![FPGA board with LEDs on and labels for LSB, MSB and RST switch](./assets/fpga-board.jpg)
 
