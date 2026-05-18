@@ -33,7 +33,8 @@ use IEEE.std_logic_unsigned.ALL;
 --use UNISIM.VComponents.all;
 
 entity processor is
-Port ( clk, reset : in STD_LOGIC );
+Port ( clk, reset : in STD_LOGIC;
+       Dout: out std_logic_vector(7 downto 0));
 end processor;
 
 architecture Behavioral of processor is
@@ -48,6 +49,8 @@ architecture Behavioral of processor is
   constant INSTR_AFC: cpu_instr_t := x"6";
   constant INSTR_LOAD: cpu_instr_t := x"7";
   constant INSTR_STORE: cpu_instr_t := x"8";
+  -- Exception: The source register for PRI is the second arg, to easily handle data hazards
+  constant INSTR_PRI: cpu_instr_t := x"9";
 
   signal OP_LIDI, OP_DIEX, OP_EXMem, OP_MemRE : cpu_instr_t;
 
@@ -175,7 +178,9 @@ begin
         wait until rising_edge(clk);
         if (reset = '0') then
             ip <= (others => '0');
+            Dout <= x"00";
         else
+        
         -- Sequentially update signals, starting with last stage
         A_MemRE <= A_EXMem;
         B_MemRE <= Mem_out;
@@ -184,11 +189,15 @@ begin
         A_EXMem <= A_DIEX;
         B_EXMem <= EX_out;
         OP_EXMem <= OP_DIEX;
-
+        
         A_DIEX <= DI_A_out;
         B_DIEX <= DI_B_out;
         C_DIEX <= register_q_b;
         OP_DIEX <= OP_LIDI;
+
+        if OP_DIEX = INSTR_PRI then
+            Dout <= B_DIEX;
+        end if;
 
         -- TODO ask why LOAD/STORE use an address from the code and not from a register ?? How does a loop work ?
         -- OK to use register according to V Migliore

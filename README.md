@@ -40,7 +40,8 @@ CPU Features:
 
 - [x] All specified assembly instructions
 - [x] Data hazards
-- [ ] PRI LED output
+- [x] PRI outputs to FPGA board LEDs (LSB is left-most)
+- [x] FPGA board has reset switch (right-most switch)
 - [ ] FPGA demo
 - [ ] Jumps
 - [ ] Function calling instructions and registers
